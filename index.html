@@ -218,19 +218,28 @@
     td { padding: 8px; border-bottom: 1px solid #e2e8f0; }
     .delete-btn { color: #e11d48; background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; }
 
-    /* Modals */
+    /* Modal Overlay (Fixed high z-index and click traps) */
     .modal-overlay { 
       display: none; 
       position: fixed; 
       inset: 0; 
-      background: rgba(15, 23, 42, 0.6); 
+      background: rgba(15, 23, 42, 0.65); 
       backdrop-filter: blur(4px);
-      z-index: 1000; 
+      z-index: 99999; 
       align-items: center; 
       justify-content: center; 
     }
     .modal-overlay.active { display: flex; }
-    .modal-card { background: #ffffff; border-radius: 14px; padding: 24px; width: 380px; box-shadow: 0 15px 30px rgba(0,0,0,0.18); border: 1px solid #cbd5e1; }
+    .modal-card { 
+      background: #ffffff; 
+      border-radius: 14px; 
+      padding: 24px; 
+      width: 90%;
+      max-width: 400px; 
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25); 
+      border: 1px solid #cbd5e1; 
+      position: relative;
+    }
 
     /* Preview Modal Window */
     .preview-modal-card {
@@ -243,6 +252,7 @@
       flex-direction: column;
       box-shadow: 0 25px 50px rgba(0,0,0,0.25);
       overflow: hidden;
+      position: relative;
     }
     .preview-header {
       padding: 14px 20px;
@@ -261,9 +271,7 @@
       justify-content: center;
     }
 
-    /* ========================================================
-       EXACT WORD & PDF FIT STYLING (CENTERED TITLE & FIT)
-       ======================================================== */
+    /* Document Sheet */
     .doc-page {
       background: #ffffff;
       width: 100%;
@@ -278,7 +286,6 @@
       box-sizing: border-box;
     }
 
-    /* Centered Title */
     .doc-page .doc-main-title {
       font-size: 17pt;
       font-weight: 700;
@@ -315,7 +322,6 @@
       line-height: 1.5;
     }
 
-    /* Container for Images with full boundary fit */
     .doc-page .doc-img-item {
       margin-top: 10px;
       margin-bottom: 20px;
@@ -344,566 +350,5 @@
       position: fixed;
       inset: 0;
       background: rgba(15, 23, 42, 0.94);
-      z-index: 2000;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      cursor: zoom-out;
-    }
-    .zoom-overlay.active { display: flex; }
-    .zoom-overlay img {
-      max-width: 95vw;
-      max-height: 95vh;
-      border-radius: 6px;
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: crisp-edges;
-    }
-
-    .bottom-bar {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-top: 12px;
-      padding: 16px;
-      background: #ffffff;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-    }
-
-    /* ========================================================
-       PRINT & PDF GENERATION RULES
-       ======================================================== */
-    @page {
-      size: A4 portrait;
-      margin: 12mm 12mm 12mm 12mm;
-    }
-
-    @media print {
-      html, body {
-        background: #ffffff !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-      body * { visibility: hidden; }
-      #printableDocArea, #printableDocArea * { visibility: visible; }
-      #printableDocArea {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        box-shadow: none !important;
-        border: none !important;
-        display: block !important;
-      }
-      .doc-page {
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        max-width: 100% !important;
-        width: 100% !important;
-      }
-      .doc-img-item {
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-        border: 1px solid #000000 !important;
-        box-shadow: none !important;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Hidden Container strictly used for standard PDF printing -->
-  <div id="printableDocArea" style="display:none;"></div>
-
-  <!-- Header -->
-  <header>
-    <div class="header-container">
-      <div class="brand-wrap">
-        <div class="brand-avatar">
-          <span class="material-symbols-rounded">verified</span>
-        </div>
-        <div class="title-area">
-          <h1>Test Execution Report Generator</h1>
-          <p>Standard QA Verification & MantisBT Documentation</p>
-        </div>
-      </div>
-      
-      <div class="btn-group">
-        <span id="saveStatus" class="badge-saved">
-          <span class="material-symbols-rounded">check_circle</span> Auto-saved
-        </span>
-        <button type="button" onclick="resetToDocDefaults()" class="btn btn-danger">
-          <span class="material-symbols-rounded">restart_alt</span> Reset
-        </button>
-        <button type="button" onclick="copyMantisSummary()" class="btn btn-slate">
-          <span class="material-symbols-rounded">content_copy</span> Copy Mantis
-        </button>
-        <button type="button" onclick="openPreviewModal()" class="btn btn-purple">
-          <span class="material-symbols-rounded">visibility</span> Preview Report
-        </button>
-        <button type="button" onclick="exportToWord()" class="btn btn-blue">
-          <span class="material-symbols-rounded">description</span> Word (.doc)
-        </button>
-        <button type="button" onclick="triggerCleanPdfPrint()" class="btn btn-slate">
-          <span class="material-symbols-rounded">picture_as_pdf</span> PDF / Print
-        </button>
-        <button type="button" onclick="downloadReportHtml()" class="btn btn-teal">
-          <span class="material-symbols-rounded">html</span> HTML
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Content Form -->
-  <main class="main-container">
-
-    <!-- Card 1: Application Details -->
-    <div class="card">
-      <div class="card-title">
-        <span class="heading-label">
-          <span class="material-symbols-rounded heading-icon">layers</span>
-          1. Application & Build Details
-        </span>
-      </div>
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Project Name / Application Name *</label>
-          <div class="project-row">
-            <select id="projectSelect" onchange="autoSave()"></select>
-            <button type="button" onclick="openProjectModal()" class="btn btn-slate">
-              <span class="material-symbols-rounded">add</span> New
-            </button>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Tested Module / Feature Names *</label>
-          <input type="text" id="moduleNames" value="Staff Management  Staff Attendance Confirmation.">
-        </div>
-
-        <div class="form-group">
-          <label>MantisBT Issue ID / Ticket *</label>
-          <input type="text" id="mantisId" placeholder="e.g. #001248">
-        </div>
-
-        <div class="form-group">
-          <label>Build Version *</label>
-          <input type="text" id="buildVersion" value="Release-52">
-        </div>
-
-        <div class="form-group">
-          <label>Test URL</label>
-          <input type="text" id="testUrl" value="jnbnivas.dev.nidhi.apcfss.in">
-        </div>
-
-        <div class="form-group">
-          <label>Login Reference</label>
-          <input type="text" id="loginRef" value="52.">
-        </div>
-      </div>
-    </div>
-
-    <!-- Card 2: Scope & Execution Steps -->
-    <div class="card">
-      <div class="card-title">
-        <span class="heading-label">
-          <span class="material-symbols-rounded heading-icon">fact_check</span>
-          2. Scope & Execution Details
-        </span>
-      </div>
-      <div class="form-group" style="margin-bottom: 14px;">
-        <label>Detailed Description about Features/Services Tested</label>
-        <textarea id="featureDesc" rows="3">Previously, the "Principal" designation was missing from the Staff Attendance Confirmation service in Production. Per the latest department requirements, added the "Principal" designation and validated its presence and functionality on the attendance confirmation screen.</textarea>
-      </div>
-
-      <div class="form-group" style="margin-bottom: 14px;">
-        <label>Actual Result</label>
-        <input type="text" id="actualResult" value="Functioning as Expected." style="color: #000000; font-weight: 500;">
-      </div>
-
-      <div class="form-group">
-        <label>Execution Steps</label>
-        <textarea id="execSteps" rows="3">1. Navigate to the URL: JNB - Nivas  Web Application
-2. Login as mentioned user , navigate to “Staff Management Staff Attendance Confirmation” , verify the presence of the "Principal" designation , check the record , select values and click “Confirm”.</textarea>
-      </div>
-    </div>
-
-    <!-- Card 3: Screenshot References & Test Evidence -->
-    <div class="card">
-      <div class="card-title">
-        <span class="heading-label">
-          <span class="material-symbols-rounded heading-icon">image</span>
-          3. Screenshot References & Test Evidence
-        </span>
-      </div>
-      
-      <!-- Zone 1: Production Screenshot Reference -->
-      <div class="form-group" style="margin-bottom: 20px;">
-        <label>Production Screenshot Reference (Appears below Detailed Description in Report)</label>
-        <div class="drop-zone" id="prodDropZone">
-          <span class="material-symbols-rounded upload-icon">cloud_upload</span>
-          <p>Click to Browse or <span>Drag & Drop / Paste (Ctrl+V)</span> Production Screenshot</p>
-          <input type="file" id="prodFileInput" accept="image/*" multiple style="display:none">
-        </div>
-        <div class="image-grid" id="prodImageGrid"></div>
-      </div>
-
-      <!-- Zone 2: Execution Screenshots -->
-      <div class="form-group">
-        <label>Test Execution Screenshots / Evidence (Appears below Execution Steps in Report)</label>
-        <div class="drop-zone" id="execDropZone">
-          <span class="material-symbols-rounded upload-icon">cloud_upload</span>
-          <p>Click to Browse or <span>Drag & Drop / Paste (Ctrl+V)</span> Execution Evidence</p>
-          <input type="file" id="execFileInput" accept="image/*" multiple style="display:none">
-        </div>
-        <div class="image-grid" id="execImageGrid"></div>
-      </div>
-    </div>
-
-    <!-- Card 4: MantisBT Defects Logged -->
-    <div class="card">
-      <div class="card-title">
-        <span class="heading-label">
-          <span class="material-symbols-rounded heading-icon">bug_report</span>
-          4. MantisBT Defects Logged
-        </span>
-        <button type="button" onclick="addDefectRow()" class="btn btn-slate">
-          <span class="material-symbols-rounded">add_circle</span> Add Mantis Bug
-        </button>
-      </div>
-      <div style="overflow-x: auto;">
-        <table>
-          <thead>
-            <tr>
-              <th style="width: 120px;">Bug ID</th>
-              <th style="width: 100px;">Severity</th>
-              <th style="width: 100px;">Priority</th>
-              <th>Description</th>
-              <th style="width: 110px;">Status</th>
-              <th style="width: 40px; text-align: center;">Action</th>
-            </tr>
-          </thead>
-          <tbody id="defectTableBody"></tbody>
-        </table>
-      </div>
-      <p id="noDefectsNotice" style="font-size: 0.75rem; color: #94a3b8; text-align: center; margin-top: 10px;">No defects logged for this ticket.</p>
-    </div>
-
-    <!-- Bottom Actions Bar -->
-    <div class="bottom-bar">
-      <button type="button" onclick="openPreviewModal()" class="btn btn-purple" style="padding: 10px 22px; font-size: 0.85rem;">
-        <span class="material-symbols-rounded">visibility</span> Preview Final Report
-      </button>
-      <button type="button" onclick="exportToWord()" class="btn btn-blue" style="padding: 10px 20px; font-size: 0.85rem;">
-        <span class="material-symbols-rounded">description</span> Word (.doc)
-      </button>
-      <button type="button" onclick="triggerCleanPdfPrint()" class="btn btn-slate" style="padding: 10px 20px; font-size: 0.85rem;">
-        <span class="material-symbols-rounded">picture_as_pdf</span> PDF / Print
-      </button>
-    </div>
-
-  </main>
-
-  <!-- Add New Project Modal -->
-  <div class="modal-overlay" id="projectModal">
-    <div class="modal-card">
-      <h3 style="font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
-        <span class="material-symbols-rounded" style="color:#0d9488;">create_new_folder</span> Add New Project
-      </h3>
-      <div class="form-group">
-        <label>Project / Application Name</label>
-        <input type="text" id="newProjectInput" placeholder="e.g. JNB-Hostel Portal">
-      </div>
-      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
-        <button type="button" onclick="closeProjectModal()" class="btn btn-slate">Cancel</button>
-        <button type="button" onclick="saveNewProject()" class="btn btn-teal">Save Project</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Interactive Live Preview Modal -->
-  <div class="modal-overlay" id="previewModal">
-    <div class="preview-modal-card">
-      <div class="preview-header">
-        <h3 style="font-size: 1rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-          <span class="material-symbols-rounded" style="color:#7c3aed;">description</span> Verify Report Preview
-        </h3>
-        <div style="display:flex; gap:8px;">
-          <button type="button" onclick="exportToWord()" class="btn btn-blue">
-            <span class="material-symbols-rounded">description</span> Word
-          </button>
-          <button type="button" onclick="triggerCleanPdfPrint()" class="btn btn-slate">
-            <span class="material-symbols-rounded">picture_as_pdf</span> PDF
-          </button>
-          <button type="button" onclick="downloadReportHtml()" class="btn btn-teal">
-            <span class="material-symbols-rounded">html</span> HTML
-          </button>
-          <button type="button" onclick="closePreviewModal()" class="btn btn-danger">
-            <span class="material-symbols-rounded">close</span>
-          </button>
-        </div>
-      </div>
-      <div class="preview-body" id="previewModalContent"></div>
-    </div>
-  </div>
-
-  <!-- Lightbox Zoom -->
-  <div class="zoom-overlay" id="zoomOverlay" onclick="this.classList.remove('active')">
-    <img id="zoomOverlayImg" src="" alt="Zoomed Screenshot">
-  </div>
-
-  <script>
-    const STORAGE_KEY = 'jnb_nivas_doc_format_v3';
-    const PROJECTS_KEY = 'qa_report_projects_doc_v3';
-
-    const initialProjects = ["JNB-Nivas Web Application.", "JNB-Hostel Application", "APCFSS Portal"];
-    let prodImages = [];
-    let execImages = [];
-    let activeDropTarget = 'exec';
-
-    function loadProjects() {
-      const saved = localStorage.getItem(PROJECTS_KEY);
-      let list = saved ? JSON.parse(saved) : initialProjects;
-      const select = document.getElementById('projectSelect');
-      select.innerHTML = '';
-      list.forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p;
-        opt.textContent = p;
-        select.appendChild(opt);
-      });
-    }
-
-    function openProjectModal() { 
-      document.getElementById('projectModal').classList.add('active'); 
-      document.getElementById('newProjectInput').focus();
-    }
-    
-    function closeProjectModal() { 
-      document.getElementById('projectModal').classList.remove('active'); 
-      document.getElementById('newProjectInput').value = '';
-    }
-
-    function saveNewProject() {
-      const val = document.getElementById('newProjectInput').value.trim();
-      if (!val) { alert('Please enter project name'); return; }
-      let list = JSON.parse(localStorage.getItem(PROJECTS_KEY) || JSON.stringify(initialProjects));
-      if (!list.includes(val)) {
-        list.push(val);
-        localStorage.setItem(PROJECTS_KEY, JSON.stringify(list));
-      }
-      loadProjects();
-      document.getElementById('projectSelect').value = val;
-      closeProjectModal();
-      autoSave();
-    }
-
-    function readFileAsDataURL(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = (err) => reject(err);
-        reader.readAsDataURL(file);
-      });
-    }
-
-    async function processFiles(files, targetType) {
-      if (!files || !files.length) return;
-      const validFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
-      for (const file of validFiles) {
-        try {
-          const dataUrl = await readFileAsDataURL(file);
-          if (targetType === 'prod') {
-            prodImages.push(dataUrl);
-          } else {
-            execImages.push(dataUrl);
-          }
-        } catch (err) {}
-      }
-      renderImages('prod');
-      renderImages('exec');
-    }
-
-    function bindDropZone(zoneId, inputId, type) {
-      const zone = document.getElementById(zoneId);
-      const input = document.getElementById(inputId);
-
-      zone.addEventListener('click', () => {
-        activeDropTarget = type;
-        input.click();
-      });
-
-      input.addEventListener('change', (e) => {
-        processFiles(e.target.files, type);
-        input.value = '';
-      });
-
-      zone.addEventListener('dragenter', (e) => {
-        e.preventDefault();
-        zone.classList.add('dragover');
-        activeDropTarget = type;
-      });
-
-      zone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        zone.classList.add('dragover');
-      });
-
-      zone.addEventListener('dragleave', (e) => {
-        e.preventDefault();
-        zone.classList.remove('dragover');
-      });
-
-      zone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        zone.classList.remove('dragover');
-        activeDropTarget = type;
-        if (e.dataTransfer && e.dataTransfer.files) {
-          processFiles(e.dataTransfer.files, type);
-        }
-      });
-    }
-
-    bindDropZone('prodDropZone', 'prodFileInput', 'prod');
-    bindDropZone('execDropZone', 'execFileInput', 'exec');
-
-    window.addEventListener('paste', (e) => {
-      const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
-      if (activeTag === 'textarea' || (activeTag === 'input' && document.activeElement.type === 'text')) {
-        return;
-      }
-
-      const clipboard = e.clipboardData || window.clipboardData;
-      if (!clipboard) return;
-
-      const items = clipboard.items;
-      const filesToProcess = [];
-
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].type.indexOf('image') !== -1) {
-          const file = items[i].getAsFile();
-          if (file) filesToProcess.push(file);
-        }
-      }
-
-      if (filesToProcess.length > 0) {
-        e.preventDefault();
-        processFiles(filesToProcess, activeDropTarget);
-      }
-    });
-
-    function renderImages(type) {
-      const grid = document.getElementById(type === 'prod' ? 'prodImageGrid' : 'execImageGrid');
-      const list = type === 'prod' ? prodImages : execImages;
-      grid.innerHTML = '';
-      list.forEach((src, idx) => {
-        const div = document.createElement('div');
-        div.className = 'image-preview';
-        div.innerHTML = `
-          <span class="order-badge">#${idx + 1}</span>
-          <img src="${src}" onclick="openZoom('${src}')">
-          <button type="button" title="Remove screenshot" onclick="removeImage('${type}',${idx}, event)">
-            <span class="material-symbols-rounded">close</span>
-          </button>
-        `;
-        grid.appendChild(div);
-      });
-    }
-
-    function removeImage(type, idx, event) {
-      if (event) event.stopPropagation();
-      if (type === 'prod') prodImages.splice(idx, 1);
-      else execImages.splice(idx, 1);
-      renderImages(type);
-    }
-
-    function openZoom(src) {
-      document.getElementById('zoomOverlayImg').src = src;
-      document.getElementById('zoomOverlay').classList.add('active');
-    }
-
-    function addDefectRow(data = {}) {
-      document.getElementById('noDefectsNotice').style.display = 'none';
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><input type="text" class="d-id" placeholder="#00142" value="${data.id || ''}"></td>
-        <td>
-          <select class="d-sev">
-            <option value="minor" ${data.sev === 'minor' ? 'selected' : ''}>minor</option>
-            <option value="major" ${data.sev === 'major' ? 'selected' : ''}>major</option>
-            <option value="block" ${data.sev === 'block' ? 'selected' : ''}>block</option>
-            <option value="crash" ${data.sev === 'crash' ? 'selected' : ''}>crash</option>
-          </select>
-        </td>
-        <td>
-          <select class="d-pri">
-            <option value="normal" ${data.pri === 'normal' ? 'selected' : ''}>normal</option>
-            <option value="high" ${data.pri === 'high' ? 'selected' : ''}>high</option>
-            <option value="urgent" ${data.pri === 'urgent' ? 'selected' : ''}>urgent</option>
-          </select>
-        </td>
-        <td><input type="text" class="d-desc" placeholder="Summary..." value="${data.desc || ''}"></td>
-        <td>
-          <select class="d-status">
-            <option value="resolved" ${data.status === 'resolved' ? 'selected' : ''}>resolved</option>
-            <option value="closed" ${data.status === 'closed' ? 'selected' : ''}>closed</option>
-            <option value="new" ${data.status === 'new' ? 'selected' : ''}>new</option>
-          </select>
-        </td>
-        <td style="text-align:center;">
-          <button type="button" class="delete-btn" onclick="this.closest('tr').remove(); checkDefectCount();">
-            <span class="material-symbols-rounded">delete</span>
-          </button>
-        </td>
-      `;
-      document.getElementById('defectTableBody').appendChild(tr);
-      tr.querySelectorAll('input, select').forEach(el => el.addEventListener('input', autoSave));
-    }
-
-    function checkDefectCount() {
-      if (document.querySelectorAll('#defectTableBody tr').length === 0) {
-        document.getElementById('noDefectsNotice').style.display = 'block';
-      }
-      autoSave();
-    }
-
-    /* ========================================================
-       CENTERED TITLE & FIT REPORT BUILDER
-       ======================================================== */
-    function buildExactDocFormatHtml() {
-      const p = document.getElementById('projectSelect').value;
-      const mod = document.getElementById('moduleNames').value;
-      const url = document.getElementById('testUrl').value;
-      const login = document.getElementById('loginRef').value;
-      const desc = document.getElementById('featureDesc').value;
-      const steps = document.getElementById('execSteps').value;
-      const res = document.getElementById('actualResult').value;
-
-      // Production Screenshots: rendered directly under description
-      let prodSectionHtml = '';
-      if (prodImages.length > 0) {
-        prodSectionHtml = `
-          <div class="doc-section-heading">Production Screenshot reference:-</div>
-          ${prodImages.map(img => `<div class="doc-img-item"><img src="${img}"></div>`).join('')}
-        `;
-      }
-
-      // Execution Screenshots: rendered directly under Execution Steps
-      let execImgsHtml = '';
-      if (execImages.length > 0) {
-        execImgsHtml = execImages.map(img => `<div class="doc-img-item"><img src="${img}"></div>`).join('');
-      }
-
-      return `
-        <div class="doc-page">
-          <!-- CENTERED TITLE -->
-          <div class="doc-main-title">Test Execution Report</div>
-          
-          <div class="doc-header-field"><strong>Project Name/Application Name:</strong> ${p}</div>
-          <div class="doc-header-field"><strong>Tested Module/Feature Names:</strong> ${mod}</div>
-          <div class="doc-header-field"><strong>Test URL:</strong> ${url}</div>
-          <div class="doc
+      z-index: 100000;
+      justify-content: center
