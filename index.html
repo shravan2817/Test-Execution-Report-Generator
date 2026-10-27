@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QA Execution Report & MantisBT Sign-off Studio</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Phosphor Icons for modern vector icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            mantis: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .circular-chart { display: block; margin: 0 auto; max-width: 96px; max-height: 96px; }
+    .circle-bg { fill: none; stroke: #e2e8f0; stroke-width: 3.6; }
+    .circle { fill: none; stroke-width: 3.6; stroke-linecap: round; stroke: #16a34a; transition: stroke-dasharray 0.4s ease, stroke 0.4s ease; }
+    .percentage { fill: #0f172a; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.54em; text-anchor: middle; }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- TOP CORPORATE HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap justify-between items-center gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-mantis-700 via-mantis-600 to-emerald-500 text-white flex items-center justify-center text-2xl shadow-sm shadow-emerald-500/20">
+          <i class="ph ph-bug-beetle"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">QA Execution & MantisBT Sign-off Studio</h1>
+            <span class="text-[10px] font-bold uppercase tracking-wider bg-mantis-100 text-mantis-800 px-2 py-0.5 rounded-full border border-mantis-200">Mantis Edition</span>
+          </div>
+          <p class="text-xs text-slate-500">Fast sign-off generation, bug defect logging & MantisBT issue note integration</p>
+        </div>
+      </div>
+
+      <!-- Header Quick Actions -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span id="saveStatus" class="text-xs font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 flex items-center gap-1.5 shadow-2xs">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Auto-saved</span>
+        </span>
+        <button type="button" onclick="loadSampleData()" class="px-3 py-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition flex items-center gap-1">
+          <i class="ph ph-lightning"></i> Load Sample
+        </button>
+        <button type="button" onclick="resetForm()" class="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-slate-200 transition">
+          Reset
+        </button>
+        <button type="button" onclick="copyMantisBTNote()" class="px-3.5 py-1.5 text-xs font-semibold text-slate-800 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg transition flex items-center gap-1.5 shadow-2xs">
+          <i class="ph ph-copy text-sm text-mantis-700"></i> Copy MantisBT Note
+        </button>
+        <button type="button" onclick="exportStandaloneHTML()" class="px-4 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+          <i class="ph ph-download-simple text-sm"></i> Export HTML
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN DUAL-COLUMN CONTAINER -->
+  <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 my-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
+    
+    <!-- LEFT COLUMN: FORM CONTROLS (7 Cols) -->
+    <div class="lg:col-span-7 space-y-6">
+
+      <!-- Section 1: Project & Mantis Target Info -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs">
+        <div class="flex items-center gap-2 mb-4 text-slate-900 font-semibold text-sm border-b border-slate-100 pb-3">
+          <i class="ph ph-folder text-emerald-600 text-lg"></i>
+          <span>1. Project & MantisBT Scope Details</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Project Name *</label>
+            <input type="text" id="projectName" placeholder="e.g. Swarnandhra Core Portal" class="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">MantisBT Issue / Ticket ID *</label>
+            <input type="text" id="mantisTicketId" placeholder="e.g. #0014285" class="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Target Version / Milestone</label>
+            <input type="text" id="targetMilestone" placeholder="e.g. v2.4.0 (Sprint 18)" class="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Environment</label>
+            <select id="environmentName" class="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+              <option value="QA Environment">QA Environment</option>
+              <option value="Staging / Pre-Prod">Staging / Pre-Prod</option>
+              <option value="UAT (User Acceptance)">UAT (User Acceptance)</option>
+              <option value="Dev Integration">Dev Integration</option>
+              <option value="Production (Hotfix)">Production (Hotfix)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Execution Date</label>
+            <input type="date" id="executionDate" class="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">QA Engineer Name *</label>
+            <input type="text" id="qaTesterName" placeholder="e.g. Rahul Sharma" class="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Lead / Approver Name</label>
+            <input type="text" id="leadApproverName" placeholder="e.g. Senior QA Lead / Test Manager" class="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Test Execution Metrics -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs">
+        <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2 text-slate-900 font-semibold text-sm">
+            <i class="ph ph-chart-pie-slice text-blue-600 text-lg"></i>
+            <span>2. Test Execution Metrics</span>
+          </div>
+          <span class="text-[11px] text-slate-400">Pass rate updates dynamically</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+          <div class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200">
+            <label class="block text-xs font-bold text-emerald-800 mb-1">Passed</label>
+            <input type="number" id="metricPassed" value="0" min="0" oninput="handleMetricChange()" class="w-full text-base sm:text-lg font-bold text-emerald-900 bg-white px-2.5 py-1 rounded-lg border border-emerald-300 focus:ring-2 focus:ring-emerald-500/30">
+          </div>
+          <div class="bg-rose-50/70 p-3 rounded-xl border border-rose-200">
+            <label class="block text-xs font-bold text-rose-800 mb-1">Failed</label>
+            <input type="number" id="metricFailed" value="0" min="0" oninput="handleMetricChange()" class="w-full text-base sm:text-lg font-bold text-rose-900 bg-white px-2.5 py-1 rounded-lg border border-rose-300 focus:ring-2 focus:ring-rose-500/30">
+          </div>
+          <div class="bg-amber-50/70 p-3 rounded-xl border border-amber-200">
+            <label class="block text-xs font-bold text-amber-800 mb-1">Blocked</label>
+            <input type="number" id="metricBlocked" value="0" min="0" oninput="handleMetricChange()" class="w-full text-base sm:text-lg font-bold text-amber-900 bg-white px-2.5 py-1 rounded-lg border border-amber-300 focus:ring-2 focus:ring-amber-500/30">
+          </div>
+          <div class="bg-slate-100 p-3 rounded-xl border border-slate-200">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Skipped</label>
+            <input type="number" id="metricSkipped" value="0" min="0" oninput="handleMetricChange()" class="w-full text-base sm:text-lg font-bold text-slate-800 bg-white px-2.5 py-1 rounded-lg border border-slate-300 focus:ring-2 focus:ring-slate-500/30">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: MantisBT Defect Log Repeater -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs">
+        <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2 text-slate-900 font-semibold text-sm">
+            <i class="ph ph-bug text-rose-600 text-lg"></i>
+            <span>3. MantisBT Defects & Blockers</span>
+          </div>
+          <button type="button" onclick="addMantisDefectRow()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-mantis-700 hover:bg-mantis-800 text-white transition flex items-center gap-1 shadow-2xs">
+            <i class="ph ph-plus-circle text-sm"></i> Add Mantis Bug
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 text-slate-500 bg-slate-50/60 font-semibold">
+                <th class="py-2.5 px-2.5 w-24">Defect ID</th>
+                <th class="py-2.5 px-2">Severity</th>
+                <th class="py-2.5 px-2">Priority</th>
+                <th class="py-2.5 px-2">Description / Steps</th>
+                <th class="py-2.5 px-2 w-28">Status</th>
+                <th class="py-2.5 px-2 text-center w-10">Act</th>
+              </tr>
+            </thead>
+            <tbody id="defectTableBody" class="divide-y divide-slate-100">
+              <!-- Dynamically rendered rows -->
+            </tbody>
+          </table>
+          <p id="noDefectsMessage" class="text-xs text-center py-5 text-slate-400 italic">No defects logged. Click "+ Add Mantis Bug" to record issues.</p>
+        </div>
+      </div>
+
+      <!-- Section 4: Automation & Test Artifacts -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs">
+        <div class="flex items-center gap-2 mb-4 text-slate-900 font-semibold text-sm border-b border-slate-100 pb-3">
+          <i class="ph ph-terminal-window text-indigo-600 text-lg"></i>
+          <span>4. Playwright Trace, Pipeline & Scope</span>
+        </div>
+        <div class="space-y-4 text-sm">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Execution Scope & Notes</label>
+            <textarea id="executionScopeNotes" rows="2" placeholder="e.g. Executed E2E checkout journey, simulated network timeouts and edge payments..." class="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"></textarea>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Playwright HTML / Trace URL</label>
+              <input type="url" id="playwrightTraceUrl" placeholder="https://trace.playwright.dev/?trace=..." class="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">CI/CD Build Pipeline URL</label>
+              <input type="url" id="ciBuildUrl" placeholder="https://github.com/.../actions/runs/..." class="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: Sign-off Decision -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs">
+        <div class="flex items-center gap-2 mb-4 text-slate-900 font-semibold text-sm border-b border-slate-100 pb-3">
+          <i class="ph ph-stamp text-teal-600 text-lg"></i>
+          <span>5. Final QA Sign-off Decision</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Sign-off Verdict *</label>
+            <select id="signOffVerdict" onchange="renderLivePreview()" class="w-full text-xs sm:text-sm font-semibold px-3 py-2.5 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+              <option value="PASSED - APPROVED FOR RELEASE">✅ PASSED - Approved for Release</option>
+              <option value="CONDITIONAL PASS - MINOR BUGS">⚠️ CONDITIONAL PASS - Known Minor Bugs</option>
+              <option value="REJECTED - BLOCKER DEFECTS">❌ REJECTED - Blocker Defects Found</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Release Remarks / Risk Notes</label>
+            <input type="text" id="signOffRemarks" placeholder="e.g. All critical workflows tested. Low severity UI glitches documented." class="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: LIVE EXECUTIVE PREVIEW (5 Cols) -->
+    <div class="lg:col-span-5">
+      <div class="sticky top-20 space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <span class="text-xs uppercase tracking-wider font-bold text-slate-400 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Live Executive Sign-off Preview
+          </span>
+          <span class="text-[11px] text-slate-400">Instant reactive view</span>
+        </div>
+
+        <!-- Rendered Card Output -->
+        <div id="executivePreviewCard" class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-md shadow-slate-200/40 space-y-5">
+          <!-- Dynamically populated via renderLivePreview() -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-slate-900 text-white px-4 py-2.5 rounded-xl text-xs font-medium shadow-xl flex items-center gap-2">
+    <i id="toastIcon" class="ph ph-check-circle text-emerald-400 text-base"></i>
+    <span id="toastMessage">Success</span>
+  </div>
+
+  <footer class="mt-auto py-4 text-center text-xs text-slate-400 border-t border-slate-200 bg-white">
+    QA Execution Report & MantisBT Sign-off Studio • Built for Agile SDET Teams
+  </footer>
+
+  <!-- CORE JAVASCRIPT LOGIC -->
+  <script>
+    const STORAGE_KEY = 'mantis_qa_studio_state_v1';
+    let mantisDefects = [];
+
+    // On Load Initialization
+    window.onload = function() {
+      // Default execution date
+      document.getElementById('executionDate').value = new Date().toISOString().split('T')[0];
+
+      // Restore stored data if available
+      loadSavedState();
+
+      // Listen to all input events for automatic real-time sync & save
+      document.querySelectorAll('input, select, textarea').forEach(element => {
+        element.addEventListener('input', () => {
+          autoSaveState();
+          renderLivePreview();
+        });
+      });
+
+      renderDefectsTable();
+      renderLivePreview();
+    };
+
+    // Calculate Metrics Helper
+    function getMetrics() {
+      const p = parseInt(document.getElementById('metricPassed').value) || 0;
+      const f = parseInt(document.getElementById('metricFailed').value) || 0;
+      const b = parseInt(document.getElementById('metricBlocked').value) || 0;
+      const s = parseInt(document.getElementById('metricSkipped').value) || 0;
+      const total = p + f + b + s;
+      const passRate = total > 0 ? Math.round((p / total) * 100) : 0;
+      return { p, f, b, s, total, passRate };
+    }
+
+    function handleMetricChange() {
+      autoSaveState();
+      renderLivePreview();
+    }
+
+    // Dynamic Defect Repeater Handlers
+    function addMantisDefectRow(data = {}) {
+      const newDefect = {
+        id: 'def_' + Date.now() + Math.random().toString(36).substring(2, 5),
+        defectId: data.defectId || '',
+        severity: data.severity || 'Major',
+        priority: data.priority || 'Normal',
+        description: data.description || '',
+        status: data.status || 'New'
+      };
+      mantisDefects.push(newDefect);
+      renderDefectsTable();
+      autoSaveState();
+      renderLivePreview();
+    }
+
+    function removeMantisDefectRow(id) {
+      mantisDefects = mantisDefects.filter(item => item.id !== id);
+      renderDefectsTable();
+      autoSaveState();
+      renderLivePreview();
+    }
+
+    function updateDefectField(id, field, value) {
+      const target = mantisDefects.find(item => item.id === id);
+      if (target) {
+        target[field] = value;
+        autoSaveState();
+        renderLivePreview();
+      }
+    }
+
+    function renderDefectsTable() {
+      const tbody = document.getElementById('defectTableBody');
+      const emptyMsg = document.getElementById('noDefectsMessage');
+      tbody.innerHTML = '';
+
+      if (mantisDefects.length === 0) {
+        emptyMsg.classList.remove('hidden');
+        return;
+      }
+      emptyMsg.classList.add('hidden');
+
+      mantisDefects.forEach(defect => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+        tr.innerHTML = `
+          <td class="py-2 px-2.5">
+            <input type="text" value="${escapeHtml(defect.defectId)}" placeholder="#00123" oninput="updateDefectField('${defect.id}', 'defectId', this.value)" class="w-full text-xs font-mono font-semibold px-2 py-1 rounded bg-slate-50 border border-slate-200">
+          </td>
+          <td class="py-2 px-2">
+            <select onchange="updateDefectField('${defect.id}', 'severity', this.value)" class="w-full text-xs px-1.5 py-1 rounded bg-slate-50 border border-slate-200">
+              <option value="Blocker" ${defect.severity === 'Blocker' ? 'selected' : ''}>Blocker</option>
+              <option value="Crash" ${defect.severity === 'Crash' ? 'selected' : ''}>Crash</option>
+              <option value="Major" ${defect.severity === 'Major' ? 'selected' : ''}>Major</option>
+              <option value="Minor" ${defect.severity === 'Minor' ? 'selected' : ''}>Minor</option>
+              <option value="Tweak" ${defect.severity === 'Tweak' ? 'selected' : ''}>Tweak</option>
+              <option value="Text" ${defect.severity === 'Text' ? 'selected' : ''}>Text</option>
+            </select>
+          </td>
+          <td class="py-2 px-2">
+            <select onchange="updateDefectField('${defect.id}', 'priority', this.value)" class="w-full text-xs px-1.5 py-1 rounded bg-slate-50 border border-slate-200">
+              <option value="Immediate" ${defect.priority === 'Immediate' ? 'selected' : ''}>Immediate</option>
+              <option value="Urgent" ${defect.priority === 'Urgent' ? 'selected' : ''}>Urgent</option>
+              <option value="High" ${defect.priority === 'High' ? 'selected' : ''}>High</option>
+              <option value="Normal" ${defect.priority === 'Normal' ? 'selected' : ''}>Normal</option>
+              <option value="Low" ${defect.priority === 'Low' ? 'selected' : ''}>Low</option>
+            </select>
+          </td>
+          <td class="py-2 px-2">
+            <input type="text" value="${escapeHtml(defect.description)}" placeholder="Defect summary or failure context..." oninput="updateDefectField('${defect.id}', 'description', this.value)" class="w-full text-xs px-2 py-1 rounded bg-slate-50 border border-slate-200">
+          </td>
+          <td class="py-2 px-2">
+            <select onchange="updateDefectField('${defect.id}', 'status', this.value)" class="w-full text-xs px-1.5 py-1 rounded bg-slate-50 border border-slate-200">
+              <option value="New" ${defect.status === 'New' ? 'selected' : ''}>New</option>
+              <option value="Assigned" ${defect.status === 'Assigned' ? 'selected' : ''}>Assigned</option>
+              <option value="Confirmed" ${defect.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+              <option value="Resolved" ${defect.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+              <option value="Closed" ${defect.status === 'Closed' ? 'selected' : ''}>Closed</option>
+            </select>
+          </td>
+          <td class="py-2 px-2 text-center">
+            <button type="button" onclick="removeMantisDefectRow('${defect.id}')" class="text-rose-500 hover:text-rose-700 p-1" title="Delete Defect">
+              <i class="ph ph-trash text-sm"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Render Right Column Live Executive Preview
+    function renderLivePreview() {
+      const { p, f, b, s, total, passRate } = getMetrics();
+      const project = document.getElementById('projectName').value.trim() || 'Untitled Project';
+      const mantisId = document.getElementById('mantisTicketId').value.trim() || '#MANTIS-ID';
+      const milestone = document.getElementById('targetMilestone').value.trim() || 'Milestone N/A';
+      const env = document.getElementById('environmentName').value;
+      const date = document.getElementById('executionDate').value;
+      const qa = document.getElementById('qaTesterName').value.trim() || 'QA Engineer';
+      const lead = document.getElementById('leadApproverName').value.trim() || 'QA Lead';
+      const verdict = document.getElementById('signOffVerdict').value;
+      const remarks = document.getElementById('signOffRemarks').value.trim();
+      const scope = document.getElementById('executionScopeNotes').value.trim();
+      const pwUrl = document.getElementById('playwrightTraceUrl').value.trim();
+      const ciUrl = document.getElementById('ciBuildUrl').value.trim();
+
+      // Color badge for verdicts
+      let verdictBadgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-300';
+      if (verdict.includes('CONDITIONAL')) verdictBadgeClass = 'bg-amber-100 text-amber-800 border-amber-300';
+      if (verdict.includes('REJECTED')) verdictBadgeClass = 'bg-rose-100 text-rose-800 border-rose-300';
+
+      // Ring stroke color
+      let ringStroke = '#16a34a';
+      if (passRate < 75) ringStroke = '#dc2626';
+      else if (passRate < 90) ringStroke = '#d97706';
+
+      let defectsSummaryHtml = '';
+      if (mantisDefects.length > 0) {
+        defectsSummaryHtml = `
+          <div class="space-y-2 pt-2 border-t border-slate-100">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">MantisBT Logged Defects (${mantisDefects.length})</span>
+            </div>
+            <div class="border border-slate-200 rounded-xl overflow-hidden">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                  <tr>
+                    <th class="p-2">ID</th>
+                    <th class="p-2">Severity</th>
+                    <th class="p-2">Summary</th>
+                    <th class="p-2">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${mantisDefects.map(d => `
+                    <tr>
+                      <td class="p-2 font-mono font-bold text-emerald-700">${escapeHtml(d.defectId || '-')}</td>
+                      <td class="p-2">
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                          d.severity === 'Blocker' || d.severity === 'Crash' 
+                            ? 'bg-rose-100 text-rose-700' 
+                            : (d.severity === 'Major' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600')
+                        }">${d.severity}</span>
+                      </td>
+                      <td class="p-2 text-slate-700 truncate max-w-[130px]">${escapeHtml(d.description || 'No description')}</td>
+                      <td class="p-2 font-medium text-slate-600">${d.status}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
+      const cardHtml = `
+        <!-- Card Header Meta -->
+        <div class="border-b border-slate-100 pb-3 flex justify-between items-start gap-2">
+          <div>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-mantis-800 bg-mantis-50 px-2 py-0.5 rounded border border-mantis-200">${env}</span>
+              <span class="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">${mantisId}</span>
+            </div>
+            <h3 class="text-base font-bold text-slate-900 mt-1 leading-snug">${escapeHtml(project)}</h3>
+            <p class="text-xs text-slate-500 font-medium">${escapeHtml(milestone)}</p>
+          </div>
+          <div class="text-right text-xs text-slate-500 flex-shrink-0">
+            <span class="block font-medium text-slate-600">${date}</span>
+            <span class="text-[11px] text-slate-400">Tester: ${escapeHtml(qa)}</span>
+          </div>
+        </div>
+
+        <!-- Metrics Donut + Summary Tiles -->
+        <div class="flex items-center gap-4 py-1">
+          <div class="relative w-20 h-20 flex-shrink-0">
+            <svg viewBox="0 0 36 36" class="circular-chart">
+              <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path class="circle" stroke="${ringStroke}" stroke-dasharray="${passRate}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <text x="18" y="20.35" class="percentage">${passRate}%</text>
+            </svg>
+          </div>
+          <div class="grid grid-cols-2 gap-2 flex-grow text-xs">
+            <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
+              <span class="text-slate-400 block text-[10px] uppercase font-semibold">Total</span>
+              <span class="text-sm font-bold text-slate-800">${total}</span>
+            </div>
+            <div class="bg-emerald-50/70 p-2 rounded-xl border border-emerald-100">
+              <span class="text-emerald-700 block text-[10px] uppercase font-semibold">Passed</span>
+              <span class="text-sm font-bold text-emerald-800">${p}</span>
+            </div>
+            <div class="bg-rose-50/70 p-2 rounded-xl border border-rose-100">
+              <span class="text-rose-700 block text-[10px] uppercase font-semibold">Failed</span>
+              <span class="text-sm font-bold text-rose-800">${f}</span>
+            </div>
+            <div class="bg-amber-50/70 p-2 rounded-xl border border-amber-100">
+              <span class="text-amber-700 block text-[10px] uppercase font-semibold">Block/Skip</span>
+              <span class="text-sm font-bold text-amber-800">${b + s}</span>
+            </div>
+          </div>
+        </div>
+
+        ${scope ? `
+          <div class="text-xs bg-slate-50 p-3 rounded-xl border border-slate-100 text-slate-600">
+            <strong class="text-slate-700">Scope:</strong> ${escapeHtml(scope)}
+          </div>
+        ` : ''}
+
+        ${(pwUrl || ciUrl) ? `
+          <div class="space-y-1.5 text-xs">
+            ${pwUrl ? `<div class="truncate text-blue-600 bg-blue-50/60 px-2.5 py-1.5 rounded-lg border border-blue-100"><i class="ph ph-arrow-square-out mr-1"></i><a href="${pwUrl}" target="_blank" class="hover:underline font-medium">Playwright Execution Report & Trace</a></div>` : ''}
+            ${ciUrl ? `<div class="truncate text-slate-600 bg-slate-100/70 px-2.5 py-1.5 rounded-lg border border-slate-200"><i class="ph ph-git-commit mr-1"></i><a href="${ciUrl}" target="_blank" class="hover:underline">CI/CD Automation Pipeline Run</a></div>` : ''}
+          </div>
+        ` : ''}
+
+        ${defectsSummaryHtml}
+
+        <!-- Final Decision Ribbon -->
+        <div class="p-3.5 rounded-xl border text-center font-bold text-xs ${verdictBadgeClass}">
+          <div>${verdict}</div>
+          ${remarks ? `<div class="text-[11px] font-normal mt-1 opacity-90">${escapeHtml(remarks)}</div>` : ''}
+          <div class="mt-2 pt-2 border-t border-black/10 flex justify-between text-[10px] font-medium opacity-80">
+            <span>QA: ${escapeHtml(qa)}</span>
+            <span>Approver: ${escapeHtml(lead)}</span>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('executivePreviewCard').innerHTML = cardHtml;
+    }
+
+    // MantisBT Formatted Note Exporter
+    function copyMantisBTNote() {
+      const { p, f, b, s, total, passRate } = getMetrics();
+      const project = document.getElementById('projectName').value.trim() || 'QA Test Run';
+      const mantisId = document.getElementById('mantisTicketId').value.trim() || 'N/A';
+      const milestone = document.getElementById('targetMilestone').value.trim() || 'N/A';
+      const env = document.getElementById('environmentName').value;
+      const date = document.getElementById('executionDate').value;
+      const qa = document.getElementById('qaTesterName').value.trim() || 'QA Tester';
+      const lead = document.getElementById('leadApproverName').value.trim() || 'Lead';
+      const verdict = document.getElementById('signOffVerdict').value;
+      const remarks = document.getElementById('signOffRemarks').value.trim();
+      const pwUrl = document.getElementById('playwrightTraceUrl').value.trim();
+      const scope = document.getElementById('executionScopeNotes').value.trim();
+
+      let defectsBlock = '';
+      if (mantisDefects.length > 0) {
+        defectsBlock = `\n--- Logged MantisBT Defects ---\n` + mantisDefects.map(d => 
+          `• [${d.defectId || 'Bug'}] (${d.severity} / ${d.priority}) [${d.status}]: ${d.description || 'No description'}`
+        ).join('\n') + '\n';
+      }
+
+      const mantisNote = `=====================================================
+QA TEST EXECUTION & SIGN-OFF REPORT
+=====================================================
+Project         : ${project}
+Mantis Issue ID : ${mantisId}
+Target Milestone: ${milestone}
+Environment     : ${env}
+Date of Run     : ${date}
+QA Engineer     : ${qa}
+Lead Approver   : ${lead}
+
+--- Execution Metrics ---
+Total Tests     : ${total}
+Passed          : ${p} (${passRate}%)
+Failed          : ${f}
+Blocked         : ${b}
+Skipped         : ${s}
+${defectsBlock}
+--- Sign-off Decision ---
+Final Verdict   : ${verdict}
+Sign-off Remarks: ${remarks || 'None'}
+${pwUrl ? `Playwright Trace: ${pwUrl}\n` : ''}${scope ? `Scope Summary   : ${scope}\n` : ''}=====================================================`;
+
+      // Copy using textarea fallback for iframe resilience
+      const tempTextArea = document.createElement("textarea");
+      tempTextArea.value = mantisNote;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempTextArea);
+
+      showToast("MantisBT formatted note copied to clipboard!");
+    }
+
+    // Export Standalone HTML Report
+    function exportStandaloneHTML() {
+      const previewCardContent = document.getElementById('executivePreviewCard').innerHTML;
+      const mantisId = document.getElementById('mantisTicketId').value.trim() || 'Report';
+
+      const standaloneDocument = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QA Sign-Off Report - ${escapeHtml(mantisId)}</title>
+  <script src="https://cdn.tailwindcss.com"></` + `script>
+</head>
+<body class="bg-slate-50 p-6 sm:p-12 min-h-screen flex items-center justify-center">
+  <div class="max-w-xl w-full bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-slate-200">
+    <div class="text-xs uppercase tracking-wider font-bold text-slate-400 mb-3">Official QA Execution & Sign-off Document</div>
+    ${previewCardContent}
+  </div>
+</body>
+</html>`;
+
+      const blob = new Blob([standaloneDocument], { type: 'text/html' });
+      const dlLink = document.createElement('a');
+      dlLink.href = URL.createObjectURL(blob);
+      dlLink.download = `QA_SignOff_${mantisId.replace(/[^a-zA-Z0-9_-]/g, '')}_${new Date().toISOString().slice(0, 10)}.html`;
+      document.body.appendChild(dlLink);
+      dlLink.click();
+      document.body.removeChild(dlLink);
+
+      showToast("Standalone HTML report downloaded!");
+    }
+
+    // Load Sample Demo Data
+    function loadSampleData() {
+      document.getElementById('projectName').value = "Swarnandhra Digital Platform";
+      document.getElementById('mantisTicketId').value = "#0014285";
+      document.getElementById('targetMilestone').value = "Release 2026.11 (Sprint 24)";
+      document.getElementById('environmentName').value = "Staging / Pre-Prod";
+      document.getElementById('qaTesterName').value = "Talari (Senior SDET)";
+      document.getElementById('leadApproverName').value = "QA Engineering Lead";
+      document.getElementById('metricPassed').value = 142;
+      document.getElementById('metricFailed').value = 2;
+      document.getElementById('metricBlocked').value = 1;
+      document.getElementById('metricSkipped').value = 0;
+      document.getElementById('executionScopeNotes').value = "Full regression test coverage for payment gateways and automated invoice generation under load. 4 parallel workers executed in headless Chromium & WebKit.";
+      document.getElementById('playwrightTraceUrl').value = "https://trace.playwright.dev/?trace=https://ci.storage.org/traces/run-842.zip";
+      document.getElementById('ciBuildUrl').value = "https://github.com/company/repo/actions/runs/984124";
+      document.getElementById('signOffVerdict').value = "CONDITIONAL PASS - MINOR BUGS";
+      document.getElementById('signOffRemarks').value = "Approved for Staging release. Hotfix for Mantis #0014290 scheduled before Production deployment.";
+
+      mantisDefects = [
+        {
+          id: 's1',
+          defectId: '#0014290',
+          severity: 'Major',
+          priority: 'High',
+          description: 'Payment gateway timeout callback on 3G throttle emulation',
+          status: 'Assigned'
+        },
+        {
+          id: 's2',
+          defectId: '#0014291',
+          severity: 'Minor',
+          priority: 'Normal',
+          description: 'Footer tax registration ID formatting misaligned on mobile screen',
+          status: 'Confirmed'
+        }
+      ];
+
+      renderDefectsTable();
+      autoSaveState();
+      renderLivePreview();
+      showToast("Sample MantisBT test run loaded!");
+    }
+
+    // LocalStorage Auto-save & Restore
+    function autoSaveState() {
+      const state = {
+        projectName: document.getElementById('projectName').value,
+        mantisTicketId: document.getElementById('mantisTicketId').value,
+        targetMilestone: document.getElementById('targetMilestone').value,
+        environmentName: document.getElementById('environmentName').value,
+        executionDate: document.getElementById('executionDate').value,
+        qaTesterName: document.getElementById('qaTesterName').value,
+        leadApproverName: document.getElementById('leadApproverName').value,
+        passed: document.getElementById('metricPassed').value,
+        failed: document.getElementById('metricFailed').value,
+        blocked: document.getElementById('metricBlocked').value,
+        skipped: document.getElementById('metricSkipped').value,
+        executionScopeNotes: document.getElementById('executionScopeNotes').value,
+        playwrightTraceUrl: document.getElementById('playwrightTraceUrl').value,
+        ciBuildUrl: document.getElementById('ciBuildUrl').value,
+        signOffVerdict: document.getElementById('signOffVerdict').value,
+        signOffRemarks: document.getElementById('signOffRemarks').value,
+        mantisDefects: mantisDefects
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+      const saveStatus = document.getElementById('saveStatus');
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      saveStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Saved ${timeStr}</span>`;
+    }
+
+    function loadSavedState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      try {
+        const state = JSON.parse(raw);
+        if (state.projectName !== undefined) document.getElementById('projectName').value = state.projectName;
+        if (state.mantisTicketId !== undefined) document.getElementById('mantisTicketId').value = state.mantisTicketId;
+        if (state.targetMilestone !== undefined) document.getElementById('targetMilestone').value = state.targetMilestone;
+        if (state.environmentName !== undefined) document.getElementById('environmentName').value = state.environmentName;
+        if (state.executionDate !== undefined) document.getElementById('executionDate').value = state.executionDate;
+        if (state.qaTesterName !== undefined) document.getElementById('qaTesterName').value = state.qaTesterName;
+        if (state.leadApproverName !== undefined) document.getElementById('leadApproverName').value = state.leadApproverName;
+        if (state.passed !== undefined) document.getElementById('metricPassed').value = state.passed;
+        if (state.failed !== undefined) document.getElementById('metricFailed').value = state.failed;
+        if (state.blocked !== undefined) document.getElementById('metricBlocked').value = state.blocked;
+        if (state.skipped !== undefined) document.getElementById('metricSkipped').value = state.skipped;
+        if (state.executionScopeNotes !== undefined) document.getElementById('executionScopeNotes').value = state.executionScopeNotes;
+        if (state.playwrightTraceUrl !== undefined) document.getElementById('playwrightTraceUrl').value = state.playwrightTraceUrl;
+        if (state.ciBuildUrl !== undefined) document.getElementById('ciBuildUrl').value = state.ciBuildUrl;
+        if (state.signOffVerdict !== undefined) document.getElementById('signOffVerdict').value = state.signOffVerdict;
+        if (state.signOffRemarks !== undefined) document.getElementById('signOffRemarks').value = state.signOffRemarks;
+        if (Array.isArray(state.mantisDefects)) mantisDefects = state.mantisDefects;
+      } catch (err) {
+        console.error("Failed to parse saved state", err);
+      }
+    }
+
+    function resetForm() {
+      if (confirm("Reset all inputs and clear saved local report?")) {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      }
+    }
+
+    // Toast UI helper
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMessage').innerText = msg;
+      toast.classList.remove('opacity-0', 'translate-y-20');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-20');
+      }, 3000);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
