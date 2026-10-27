@@ -4,65 +4,140 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QA Execution Report - JNB-Nivas</title>
+  
+  <!-- Google Material Symbols (Material UI Icons) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     body { background-color: #f8fafc; color: #1e293b; padding-bottom: 70px; }
     
+    /* Material Icons Helper */
+    .material-symbols-rounded {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+      display: inline-block;
+      line-height: 1;
+    }
+
+    /* Keyframe Animations */
+    @keyframes softPulse {
+      0% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(13, 148, 136, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
+    }
+
+    @keyframes bounceFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    @keyframes rotateIcon {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
     /* Header */
-    header { background: #ffffff; border-bottom: 1px solid #cbd5e1; position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-    .header-container { max-width: 1050px; margin: 0 auto; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    header { background: #ffffff; border-bottom: 1px solid #cbd5e1; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+    .header-container { max-width: 1050px; margin: 0 auto; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    
+    .brand-wrap { display: flex; align-items: center; gap: 10px; }
+    .brand-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: softPulse 2.5s infinite;
+    }
+    .brand-avatar .material-symbols-rounded { font-size: 24px; }
+    
     .title-area h1 { font-size: 1.25rem; font-weight: 800; color: #0f172a; letter-spacing: -0.3px; }
     .title-area p { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
     
     /* Action Buttons */
     .btn-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .btn { padding: 7px 14px; font-size: 0.75rem; font-weight: 600; border-radius: 6px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; }
-    .btn-slate { background: #ffffff; color: #334155; border-color: #cbd5e1; }
+    .btn { 
+      padding: 7px 13px; 
+      font-size: 0.75rem; 
+      font-weight: 600; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      border: 1px solid transparent; 
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 6px; 
+    }
+    .btn .material-symbols-rounded { font-size: 16px; transition: transform 0.2s ease; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:hover .material-symbols-rounded { transform: scale(1.1); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-slate { background: #ffffff; color: #334155; border-color: #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
     .btn-slate:hover { background: #f8fafc; border-color: #94a3b8; }
-    .btn-teal { background: #0d9488; color: #ffffff; }
+    .btn-teal { background: #0d9488; color: #ffffff; box-shadow: 0 2px 4px rgba(13, 148, 136, 0.2); }
     .btn-teal:hover { background: #0f766e; }
-    .btn-blue { background: #2563eb; color: #ffffff; }
+    .btn-blue { background: #2563eb; color: #ffffff; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2); }
     .btn-blue:hover { background: #1d4ed8; }
-    .btn-purple { background: #7c3aed; color: #ffffff; }
+    .btn-purple { background: #7c3aed; color: #ffffff; box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2); }
     .btn-purple:hover { background: #6d28d9; }
     .btn-danger { background: #fff1f2; color: #e11d48; border-color: #fecdd3; }
     .btn-danger:hover { background: #ffe4e6; }
-    .badge-saved { font-size: 0.72rem; color: #047857; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 4px 8px; border-radius: 6px; font-weight: 600; }
+    
+    .badge-saved { 
+      font-size: 0.72rem; 
+      color: #047857; 
+      background: #ecfdf5; 
+      border: 1px solid #a7f3d0; 
+      padding: 5px 9px; 
+      border-radius: 6px; 
+      font-weight: 600; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 4px; 
+    }
+    .badge-saved .material-symbols-rounded { font-size: 14px; animation: bounceFloat 2s infinite ease-in-out; }
 
     /* Layout */
     .main-container { max-width: 1050px; margin: 24px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 22px; }
     
-    /* Cards with Highlighted Side Headings */
-    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+    /* Cards */
+    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
     .card-title { 
       font-size: 0.95rem; 
       font-weight: 800; 
       color: #0f172a; 
       background: #f8fafc; 
       border-left: 4px solid #0d9488; 
-      padding: 8px 12px; 
-      border-radius: 0 6px 6px 0; 
+      padding: 9px 12px; 
+      border-radius: 0 8px 8px 0; 
       margin: -6px 0 18px 0; 
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
     }
-    
+    .card-title .heading-label { display: flex; align-items: center; gap: 8px; }
+    .card-title .heading-icon { color: #0d9488; font-size: 19px; }
+
     /* Form Grid */
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     label { font-size: 0.76rem; font-weight: 700; color: #334155; }
     
-    /* Inputs & Select */
     input[type="text"], select, textarea {
       width: 100%; 
       padding: 9px 12px; 
       font-size: 0.83rem; 
       border: 1px solid #cbd5e1; 
-      border-radius: 6px; 
+      border-radius: 8px; 
       outline: none; 
       background: #ffffff; 
       color: #0f172a;
+      transition: all 0.15s ease;
     }
     select {
       appearance: none;
@@ -81,22 +156,83 @@
 
     /* Screenshot Upload Zones */
     .drop-zone {
-      border: 2px dashed #94a3b8; border-radius: 8px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; transition: 0.2s;
+      border: 2px dashed #94a3b8; 
+      border-radius: 10px; 
+      padding: 24px 14px; 
+      text-align: center; 
+      background: #f8fafc; 
+      cursor: pointer; 
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
-    .drop-zone:hover, .drop-zone.dragover { border-color: #0d9488; background: #f0fdfa; }
-    .drop-zone p { font-size: 0.8rem; color: #64748b; }
-    .drop-zone span { font-size: 0.8rem; color: #0d9488; font-weight: 700; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: #0d9488; background: #f0fdfa; transform: scale(1.005); }
+    .drop-zone .upload-icon { font-size: 32px; color: #0d9488; animation: bounceFloat 2.2s infinite ease-in-out; }
+    .drop-zone p { font-size: 0.82rem; color: #64748b; pointer-events: none; }
+    .drop-zone span { font-size: 0.82rem; color: #0d9488; font-weight: 700; pointer-events: none; }
     
-    .image-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-    .image-preview { position: relative; width: 120px; height: 85px; border-radius: 6px; overflow: hidden; border: 1px solid #cbd5e1; }
-    .image-preview img { width: 100%; height: 100%; object-fit: cover; }
-    .image-preview button { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.65); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; }
+    .image-grid { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; }
+    .image-preview { 
+      position: relative; 
+      width: 155px; 
+      height: 105px; 
+      border-radius: 8px; 
+      overflow: hidden; 
+      border: 1px solid #cbd5e1; 
+      background: #f1f5f9;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .image-preview:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+    .image-preview img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+    }
+    .image-preview .order-badge {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      background: rgba(15, 23, 42, 0.85);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      z-index: 2;
+    }
+    .image-preview button { 
+      position: absolute; 
+      top: 4px; 
+      right: 4px; 
+      background: rgba(225, 29, 72, 0.9); 
+      color: white; 
+      border: none; 
+      border-radius: 50%; 
+      width: 22px; 
+      height: 22px; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer; 
+      z-index: 2;
+      transition: background 0.15s ease;
+    }
+    .image-preview button:hover { background: #be123c; }
+    .image-preview button .material-symbols-rounded { font-size: 14px; }
 
     /* Defect Table */
     table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-top: 10px; }
     th { background: #f8fafc; color: #475569; font-weight: 700; text-align: left; padding: 10px; border-bottom: 2px solid #cbd5e1; }
     td { padding: 8px; border-bottom: 1px solid #e2e8f0; }
-    .delete-btn { color: #e11d48; background: none; border: none; cursor: pointer; font-weight: 800; font-size: 15px; }
+    .delete-btn { color: #e11d48; background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; }
+    .delete-btn:hover { color: #9f1239; }
 
     /* Modals */
     .modal-overlay { 
@@ -104,24 +240,24 @@
       position: fixed; 
       inset: 0; 
       background: rgba(15, 23, 42, 0.6); 
-      backdrop-filter: blur(3px);
+      backdrop-filter: blur(4px);
       z-index: 1000; 
       align-items: center; 
       justify-content: center; 
     }
     .modal-overlay.active { display: flex; }
-    .modal-card { background: #ffffff; border-radius: 12px; padding: 24px; width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #cbd5e1; }
+    .modal-card { background: #ffffff; border-radius: 14px; padding: 24px; width: 380px; box-shadow: 0 15px 30px rgba(0,0,0,0.18); border: 1px solid #cbd5e1; }
 
-    /* Large Preview Modal */
+    /* Preview Modal */
     .preview-modal-card {
       background: #ffffff;
-      width: 90%;
-      max-width: 900px;
-      max-height: 90vh;
-      border-radius: 12px;
+      width: 92%;
+      max-width: 980px;
+      max-height: 92vh;
+      border-radius: 14px;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.22);
       overflow: hidden;
     }
     .preview-header {
@@ -138,13 +274,12 @@
       background: #ffffff;
     }
 
-    /* Soft UI Report Theme for Preview & Output */
+    /* Report Sheet Styling */
     .report-sheet {
       background: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 10px;
       padding: 24px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
     .report-sheet h2 {
       font-size: 1.3rem;
@@ -174,7 +309,7 @@
       font-size: 0.85rem;
       font-weight: 800;
       color: #0f172a;
-      margin: 16px 0 6px 0;
+      margin: 18px 0 6px 0;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -188,27 +323,74 @@
       line-height: 1.5;
       white-space: pre-wrap;
     }
-    .report-img {
-      max-width: 100%;
-      border-radius: 6px;
+    .report-img-container {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 10px;
+    }
+    .report-img-wrapper {
       border: 1px solid #cbd5e1;
-      margin-top: 8px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .report-img-wrapper .img-toolbar {
+      background: #f8fafc;
+      padding: 6px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .report-img-wrapper img {
+      width: 100%;
+      display: block;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+      cursor: zoom-in;
     }
 
-    /* Bottom Action Bar */
+    /* Lightbox Zoom */
+    .zoom-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.94);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      cursor: zoom-out;
+    }
+    .zoom-overlay.active { display: flex; }
+    .zoom-overlay img {
+      max-width: 95vw;
+      max-height: 95vh;
+      border-radius: 8px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+    }
+
     .bottom-bar {
       display: flex;
       justify-content: center;
       gap: 12px;
-      margin-top: 10px;
+      margin-top: 12px;
       padding: 16px;
       background: #ffffff;
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
 
     @media print {
-      header, .bottom-bar, .btn, .modal-overlay, .delete-btn, .drop-zone, .badge-saved { display: none !important; }
+      header, .bottom-bar, .btn, .modal-overlay, .delete-btn, .drop-zone, .badge-saved, .zoom-overlay { display: none !important; }
       body { background: white; padding: 0; }
       .card { border: none; box-shadow: none; padding: 10px 0; }
     }
@@ -219,18 +401,38 @@
   <!-- Header -->
   <header>
     <div class="header-container">
-      <div class="title-area">
-        <h1>Test Execution Report Generator</h1>
-        <p>Standard QA Verification & MantisBT Documentation</p>
+      <div class="brand-wrap">
+        <div class="brand-avatar">
+          <span class="material-symbols-rounded">verified</span>
+        </div>
+        <div class="title-area">
+          <h1>Test Execution Report Generator</h1>
+          <p>Standard QA Verification & MantisBT Documentation</p>
+        </div>
       </div>
+      
       <div class="btn-group">
-        <span id="saveStatus" class="badge-saved">💾 Auto-saved</span>
-        <button type="button" onclick="resetToDocDefaults()" class="btn btn-danger">Reset</button>
-        <button type="button" onclick="copyMantisSummary()" class="btn btn-slate">Copy Mantis</button>
-        <button type="button" onclick="openPreviewModal()" class="btn btn-purple">👁️ Preview Report</button>
-        <button type="button" onclick="exportToWord()" class="btn btn-blue">Word (.doc)</button>
-        <button type="button" onclick="window.print()" class="btn btn-slate">Print / PDF</button>
-        <button type="button" onclick="downloadReportHtml()" class="btn btn-teal">HTML</button>
+        <span id="saveStatus" class="badge-saved">
+          <span class="material-symbols-rounded">check_circle</span> Auto-saved
+        </span>
+        <button type="button" onclick="resetToDocDefaults()" class="btn btn-danger">
+          <span class="material-symbols-rounded">restart_alt</span> Reset
+        </button>
+        <button type="button" onclick="copyMantisSummary()" class="btn btn-slate">
+          <span class="material-symbols-rounded">content_copy</span> Copy Mantis
+        </button>
+        <button type="button" onclick="openPreviewModal()" class="btn btn-purple">
+          <span class="material-symbols-rounded">visibility</span> Preview Report
+        </button>
+        <button type="button" onclick="exportToWord()" class="btn btn-blue">
+          <span class="material-symbols-rounded">description</span> Word (.doc)
+        </button>
+        <button type="button" onclick="window.print()" class="btn btn-slate">
+          <span class="material-symbols-rounded">print</span> Print / PDF
+        </button>
+        <button type="button" onclick="downloadReportHtml()" class="btn btn-teal">
+          <span class="material-symbols-rounded">html</span> HTML
+        </button>
       </div>
     </div>
   </header>
@@ -240,13 +442,20 @@
 
     <!-- Card 1: Application Details -->
     <div class="card">
-      <div class="card-title">1. Application & Build Details</div>
+      <div class="card-title">
+        <span class="heading-label">
+          <span class="material-symbols-rounded heading-icon">layers</span>
+          1. Application & Build Details
+        </span>
+      </div>
       <div class="grid-2">
         <div class="form-group">
           <label>Project Name / Application Name *</label>
           <div class="project-row">
             <select id="projectSelect" onchange="autoSave()"></select>
-            <button type="button" onclick="openProjectModal()" class="btn btn-slate">+ New</button>
+            <button type="button" onclick="openProjectModal()" class="btn btn-slate">
+              <span class="material-symbols-rounded">add</span> New
+            </button>
           </div>
         </div>
 
@@ -279,7 +488,12 @@
 
     <!-- Card 2: Scope & Execution Steps -->
     <div class="card">
-      <div class="card-title">2. Scope & Execution Details</div>
+      <div class="card-title">
+        <span class="heading-label">
+          <span class="material-symbols-rounded heading-icon">fact_check</span>
+          2. Scope & Execution Details
+        </span>
+      </div>
       <div class="form-group" style="margin-bottom: 14px;">
         <label>Detailed Description about Features/Services Tested</label>
         <textarea id="featureDesc" rows="3">Previously, the "Principal" designation was missing from the Staff Attendance Confirmation service in Production. Per the latest department requirements, added the "Principal" designation and validated its presence and functionality on the attendance confirmation screen.</textarea>
@@ -291,36 +505,39 @@
 2. Login as mentioned user, navigate to “Staff Management -> Staff Attendance Confirmation”, verify the presence of the "Principal" designation, check the record, select values and click “Confirm”.</textarea>
       </div>
 
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Actual Result</label>
-          <input type="text" id="actualResult" value="Functioning as Expected." style="color: #0f172a; font-weight: 600;">
-        </div>
-        <div class="form-group">
-          <label>Tested By / Tester Name</label>
-          <input type="text" id="testerName" placeholder="Your Name">
-        </div>
+      <div class="form-group">
+        <label>Actual Result</label>
+        <input type="text" id="actualResult" value="Functioning as Expected." style="color: #0f172a; font-weight: 600;">
       </div>
     </div>
 
     <!-- Card 3: Screenshot References & Test Evidence -->
     <div class="card">
-      <div class="card-title">3. Screenshot References & Test Evidence</div>
+      <div class="card-title">
+        <span class="heading-label">
+          <span class="material-symbols-rounded heading-icon">image</span>
+          3. Screenshot References & Test Evidence
+        </span>
+      </div>
       
-      <div class="form-group" style="margin-bottom: 18px;">
-        <label>Production Screenshot Reference (Drag & Drop, Paste Ctrl+V, or Browse)</label>
-        <div class="drop-zone" id="prodDropZone" onclick="document.getElementById('prodFileInput').click()">
+      <!-- Zone 1: Production Screenshot Reference -->
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label>Production Screenshot Reference (Click to Browse, Drag & Drop, or Paste Ctrl+V)</label>
+        <div class="drop-zone" id="prodDropZone">
+          <span class="material-symbols-rounded upload-icon">cloud_upload</span>
           <p>Click to Browse or <span>Drag & Drop / Paste (Ctrl+V)</span> Production Screenshot</p>
-          <input type="file" id="prodFileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event, 'prod')">
+          <input type="file" id="prodFileInput" accept="image/*" multiple style="display:none">
         </div>
         <div class="image-grid" id="prodImageGrid"></div>
       </div>
 
+      <!-- Zone 2: Execution Screenshots / Evidence -->
       <div class="form-group">
-        <label>Test Execution Screenshots / Verified Evidence</label>
-        <div class="drop-zone" id="execDropZone" onclick="document.getElementById('execFileInput').click()">
+        <label>Test Execution Screenshots / Evidence (Click to Browse, Drag & Drop, or Paste Ctrl+V)</label>
+        <div class="drop-zone" id="execDropZone">
+          <span class="material-symbols-rounded upload-icon">cloud_upload</span>
           <p>Click to Browse or <span>Drag & Drop / Paste (Ctrl+V)</span> Execution Evidence</p>
-          <input type="file" id="execFileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event, 'exec')">
+          <input type="file" id="execFileInput" accept="image/*" multiple style="display:none">
         </div>
         <div class="image-grid" id="execImageGrid"></div>
       </div>
@@ -329,8 +546,13 @@
     <!-- Card 4: MantisBT Defects Logged -->
     <div class="card">
       <div class="card-title">
-        <span>4. MantisBT Defects Logged</span>
-        <button type="button" onclick="addDefectRow()" class="btn btn-slate">+ Add Mantis Bug</button>
+        <span class="heading-label">
+          <span class="material-symbols-rounded heading-icon">bug_report</span>
+          4. MantisBT Defects Logged
+        </span>
+        <button type="button" onclick="addDefectRow()" class="btn btn-slate">
+          <span class="material-symbols-rounded">add_circle</span> Add Mantis Bug
+        </button>
       </div>
       <div style="overflow-x: auto;">
         <table>
@@ -350,16 +572,16 @@
       <p id="noDefectsNotice" style="font-size: 0.75rem; color: #94a3b8; text-align: center; margin-top: 10px;">No defects logged for this ticket.</p>
     </div>
 
-    <!-- Bottom Preview & Actions Bar -->
+    <!-- Bottom Actions Bar -->
     <div class="bottom-bar">
-      <button type="button" onclick="openPreviewModal()" class="btn btn-purple" style="padding: 10px 20px; font-size: 0.85rem;">
-        👁️ Preview Final Report Before Download
+      <button type="button" onclick="openPreviewModal()" class="btn btn-purple" style="padding: 10px 22px; font-size: 0.85rem;">
+        <span class="material-symbols-rounded">visibility</span> Preview Final Report
       </button>
-      <button type="button" onclick="exportToWord()" class="btn btn-blue" style="padding: 10px 18px; font-size: 0.85rem;">
-        Word (.doc)
+      <button type="button" onclick="exportToWord()" class="btn btn-blue" style="padding: 10px 20px; font-size: 0.85rem;">
+        <span class="material-symbols-rounded">description</span> Word (.doc)
       </button>
-      <button type="button" onclick="window.print()" class="btn btn-slate" style="padding: 10px 18px; font-size: 0.85rem;">
-        Print / PDF
+      <button type="button" onclick="window.print()" class="btn btn-slate" style="padding: 10px 20px; font-size: 0.85rem;">
+        <span class="material-symbols-rounded">print</span> Print / PDF
       </button>
     </div>
 
@@ -368,7 +590,9 @@
   <!-- Add New Project Modal -->
   <div class="modal-overlay" id="projectModal">
     <div class="modal-card">
-      <h3 style="font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 12px;">Add New Project</h3>
+      <h3 style="font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+        <span class="material-symbols-rounded" style="color:#0d9488;">create_new_folder</span> Add New Project
+      </h3>
       <div class="form-group">
         <label>Project / Application Name</label>
         <input type="text" id="newProjectInput" placeholder="e.g. JNB-Hostel Portal">
@@ -384,29 +608,43 @@
   <div class="modal-overlay" id="previewModal">
     <div class="preview-modal-card">
       <div class="preview-header">
-        <h3 style="font-size: 1rem; font-weight: 800; color: #0f172a;">Verify Report Preview (Soft UI View)</h3>
+        <h3 style="font-size: 1rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+          <span class="material-symbols-rounded" style="color:#7c3aed;">pageview</span> Verify Report Preview
+        </h3>
         <div style="display:flex; gap:8px;">
-          <button type="button" onclick="exportToWord()" class="btn btn-blue">Word</button>
-          <button type="button" onclick="window.print()" class="btn btn-slate">PDF</button>
-          <button type="button" onclick="downloadReportHtml()" class="btn btn-teal">HTML</button>
-          <button type="button" onclick="closePreviewModal()" class="btn btn-danger">Close</button>
+          <button type="button" onclick="exportToWord()" class="btn btn-blue">
+            <span class="material-symbols-rounded">description</span> Word
+          </button>
+          <button type="button" onclick="window.print()" class="btn btn-slate">
+            <span class="material-symbols-rounded">print</span> PDF
+          </button>
+          <button type="button" onclick="downloadReportHtml()" class="btn btn-teal">
+            <span class="material-symbols-rounded">html</span> HTML
+          </button>
+          <button type="button" onclick="closePreviewModal()" class="btn btn-danger">
+            <span class="material-symbols-rounded">close</span>
+          </button>
         </div>
       </div>
-      <div class="preview-body" id="previewModalContent">
-        <!-- Rendered Report will be injected here -->
-      </div>
+      <div class="preview-body" id="previewModalContent"></div>
     </div>
   </div>
 
+  <!-- Fullscreen Zoom Lightbox -->
+  <div class="zoom-overlay" id="zoomOverlay" onclick="this.classList.remove('active')">
+    <img id="zoomOverlayImg" src="" alt="Zoomed Screenshot">
+  </div>
+
   <script>
-    const STORAGE_KEY = 'jnb_nivas_clean_report_v4';
-    const PROJECTS_KEY = 'qa_report_projects_list_v4';
+    const STORAGE_KEY = 'jnb_nivas_report_mui_v1';
+    const PROJECTS_KEY = 'qa_report_projects_mui_v1';
 
     const initialProjects = ["JNB-Nivas Web Application", "JNB-Hostel Application", "APCFSS Portal"];
     let prodImages = [];
     let execImages = [];
+    let activeDropTarget = 'exec';
 
-    // Projects
+    // Projects Setup
     function loadProjects() {
       const saved = localStorage.getItem(PROJECTS_KEY);
       let list = saved ? JSON.parse(saved) : initialProjects;
@@ -444,49 +682,104 @@
       autoSave();
     }
 
-    // Screenshots
-    function setupDropZone(zoneId, type) {
-      const zone = document.getElementById(zoneId);
-      zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
-      zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
-      zone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        zone.classList.remove('dragover');
-        if (e.dataTransfer.files.length) handleImageFiles(e.dataTransfer.files, type);
-      });
-    }
-    setupDropZone('prodDropZone', 'prod');
-    setupDropZone('execDropZone', 'exec');
-
-    window.addEventListener('paste', (e) => {
-      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-      for (let item of items) {
-        if (item.type.indexOf('image') === 0) {
-          const file = item.getAsFile();
-          handleImageFiles([file], 'exec');
-        }
-      }
-    });
-
-    function handleFileSelect(e, type) {
-      if (e.target.files.length) handleImageFiles(e.target.files, type);
-    }
-
-    function handleImageFiles(files, type) {
-      Array.from(files).forEach(file => {
+    // Direct, Lossless Image Loader
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = (event) => {
-          if (type === 'prod') {
-            prodImages.push(event.target.result);
-            renderImages('prod');
-          } else {
-            execImages.push(event.target.result);
-            renderImages('exec');
-          }
-        };
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = (err) => reject(err);
         reader.readAsDataURL(file);
       });
     }
+
+    async function processFiles(files, targetType) {
+      if (!files || !files.length) return;
+      const validFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+      for (const file of validFiles) {
+        try {
+          const dataUrl = await readFileAsDataURL(file);
+          if (targetType === 'prod') {
+            prodImages.push(dataUrl);
+          } else {
+            execImages.push(dataUrl);
+          }
+        } catch (err) {
+          console.error("Error reading image:", err);
+        }
+      }
+      renderImages('prod');
+      renderImages('exec');
+    }
+
+    // Dropzone Initializers
+    function bindDropZone(zoneId, inputId, type) {
+      const zone = document.getElementById(zoneId);
+      const input = document.getElementById(inputId);
+
+      zone.addEventListener('click', () => {
+        activeDropTarget = type;
+        input.click();
+      });
+
+      input.addEventListener('change', (e) => {
+        processFiles(e.target.files, type);
+        input.value = '';
+      });
+
+      zone.addEventListener('dragenter', (e) => {
+        e.preventDefault();
+        zone.classList.add('dragover');
+        activeDropTarget = type;
+      });
+
+      zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('dragover');
+      });
+
+      zone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+      });
+
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        activeDropTarget = type;
+        if (e.dataTransfer && e.dataTransfer.files) {
+          processFiles(e.dataTransfer.files, type);
+        }
+      });
+    }
+
+    bindDropZone('prodDropZone', 'prodFileInput', 'prod');
+    bindDropZone('execDropZone', 'execFileInput', 'exec');
+
+    // Global Clipboard Paste Listener (Ctrl + V)
+    window.addEventListener('paste', (e) => {
+      const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+      if (activeTag === 'textarea' || (activeTag === 'input' && document.activeElement.type === 'text')) {
+        return;
+      }
+
+      const clipboard = e.clipboardData || window.clipboardData;
+      if (!clipboard) return;
+
+      const items = clipboard.items;
+      const filesToProcess = [];
+
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          const file = items[i].getAsFile();
+          if (file) filesToProcess.push(file);
+        }
+      }
+
+      if (filesToProcess.length > 0) {
+        e.preventDefault();
+        processFiles(filesToProcess, activeDropTarget);
+      }
+    });
 
     function renderImages(type) {
       const grid = document.getElementById(type === 'prod' ? 'prodImageGrid' : 'execImageGrid');
@@ -495,15 +788,27 @@
       list.forEach((src, idx) => {
         const div = document.createElement('div');
         div.className = 'image-preview';
-        div.innerHTML = `<img src="${src}"><button type="button" onclick="removeImage('${type}', ${idx})">×</button>`;
+        div.innerHTML = `
+          <span class="order-badge">#${idx + 1}</span>
+          <img src="${src}" onclick="openZoom('${src}')">
+          <button type="button" title="Remove screenshot" onclick="removeImage('${type}', ${idx}, event)">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        `;
         grid.appendChild(div);
       });
     }
 
-    function removeImage(type, idx) {
+    function removeImage(type, idx, event) {
+      if (event) event.stopPropagation();
       if (type === 'prod') prodImages.splice(idx, 1);
       else execImages.splice(idx, 1);
       renderImages(type);
+    }
+
+    function openZoom(src) {
+      document.getElementById('zoomOverlayImg').src = src;
+      document.getElementById('zoomOverlay').classList.add('active');
     }
 
     // Defects Table
@@ -535,7 +840,11 @@
             <option value="new" ${data.status === 'new' ? 'selected' : ''}>new</option>
           </select>
         </td>
-        <td style="text-align:center;"><button type="button" class="delete-btn" onclick="this.closest('tr').remove(); checkDefectCount();">×</button></td>
+        <td style="text-align:center;">
+          <button type="button" class="delete-btn" onclick="this.closest('tr').remove(); checkDefectCount();">
+            <span class="material-symbols-rounded">delete</span>
+          </button>
+        </td>
       `;
       document.getElementById('defectTableBody').appendChild(tr);
       tr.querySelectorAll('input, select').forEach(el => el.addEventListener('input', autoSave));
@@ -548,7 +857,7 @@
       autoSave();
     }
 
-    // Generate Beautiful Soft UI Report HTML
+    // Formatted Report Render
     function buildFormattedReportHtml() {
       const p = document.getElementById('projectSelect').value;
       const mId = document.getElementById('mantisId').value || 'N/A';
@@ -559,10 +868,24 @@
       const desc = document.getElementById('featureDesc').value;
       const steps = document.getElementById('execSteps').value;
       const res = document.getElementById('actualResult').value;
-      const tester = document.getElementById('testerName').value || 'QA Team';
 
-      let prodImgsHtml = prodImages.map(img => `<img src="${img}" class="report-img">`).join('');
-      let execImgsHtml = execImages.map(img => `<img src="${img}" class="report-img">`).join('');
+      let prodImgsHtml = prodImages.map((img, i) => `
+        <div class="report-img-wrapper">
+          <div class="img-toolbar">
+            <span>Production Reference #${i+1}</span>
+            <span style="font-size:10px; color:#0d9488;">Click image to Zoom HD</span>
+          </div>
+          <img src="${img}" onclick="openZoom('${img}')">
+        </div>`).join('');
+
+      let execImgsHtml = execImages.map((img, i) => `
+        <div class="report-img-wrapper">
+          <div class="img-toolbar">
+            <span>Execution Evidence #${i+1}</span>
+            <span style="font-size:10px; color:#0d9488;">Click image to Zoom HD</span>
+          </div>
+          <img src="${img}" onclick="openZoom('${img}')">
+        </div>`).join('');
 
       return `
         <div class="report-sheet">
@@ -574,14 +897,13 @@
             </tr>
             <tr>
               <th>Build Version</th><td>${bVer}</td>
-              <th>Tested By</th><td>${tester}</td>
+              <th>Test URL</th><td>${url}</td>
             </tr>
             <tr>
               <th>Tested Module / Features</th><td colspan="3">${mod}</td>
             </tr>
             <tr>
-              <th>Test URL</th><td>${url}</td>
-              <th>Login Reference</th><td>${login}</td>
+              <th>Login Reference</th><td colspan="3">${login}</td>
             </tr>
           </table>
 
@@ -594,13 +916,12 @@
           <div class="report-section-title">Actual Result:</div>
           <div class="report-box" style="font-weight:700; color:#0f172a;">${res}</div>
 
-          ${prodImgsHtml ? `<div class="report-section-title">Production Screenshot Reference:</div><div>${prodImgsHtml}</div>` : ''}
-          ${execImgsHtml ? `<div class="report-section-title">Execution Screenshots / Verified Evidence:</div><div>${execImgsHtml}</div>` : ''}
+          ${prodImgsHtml ? `<div class="report-section-title">Production Screenshot Reference:</div><div class="report-img-container">${prodImgsHtml}</div>` : ''}
+          ${execImgsHtml ? `<div class="report-section-title">Execution Screenshots / Evidence:</div><div class="report-img-container">${execImgsHtml}</div>` : ''}
         </div>
       `;
     }
 
-    // Modal Handlers
     function openPreviewModal() {
       document.getElementById('previewModalContent').innerHTML = buildFormattedReportHtml();
       document.getElementById('previewModal').classList.add('active');
@@ -610,7 +931,6 @@
       document.getElementById('previewModal').classList.remove('active');
     }
 
-    // Export 1: Word Document (.doc) with Soft Clean Styling
     function exportToWord() {
       const p = document.getElementById('projectSelect').value;
       const mId = document.getElementById('mantisId').value || 'N/A';
@@ -621,7 +941,6 @@
       const desc = document.getElementById('featureDesc').value;
       const steps = document.getElementById('execSteps').value;
       const res = document.getElementById('actualResult').value;
-      const tester = document.getElementById('testerName').value || 'QA Team';
 
       const htmlContent = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
@@ -642,7 +961,7 @@
             <div style="font-size: 9pt; color: #64748b; margin-top: 2pt;">Build Version: ${bVer} | MantisBT Issue ID: ${mId}</div>
           </div>
           <table>
-            <tr><th width="28%">Project / Application</th><td>${p}</td><th width="20%">Tested By</th><td>${tester}</td></tr>
+            <tr><th width="30%">Project / Application</th><td>${p}</td><th width="20%">Build Version</th><td>${bVer}</td></tr>
             <tr><th>Tested Module / Features</th><td colspan="3">${mod}</td></tr>
             <tr><th>Test URL</th><td>${url}</td><th>Login Reference</th><td>${login}</td></tr>
           </table>
@@ -661,7 +980,6 @@
       a.click();
     }
 
-    // Export 2: HTML
     function downloadReportHtml() {
       const p = document.getElementById('projectSelect').value;
       const mId = document.getElementById('mantisId').value || 'N/A';
@@ -670,15 +988,16 @@
       const fullHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Report - ${p}</title>
       <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #ffffff; padding: 30px; color: #1e293b; }
-        .wrapper { max-width: 850px; margin: 0 auto; }
-        .report-sheet { border: 1px solid #e2e8f0; border-radius: 10px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .wrapper { max-width: 900px; margin: 0 auto; }
+        .report-sheet { border: 1px solid #e2e8f0; border-radius: 10px; padding: 24px; }
         h2 { font-size: 1.3rem; font-weight: 800; color: #0f172a; border-bottom: 2px solid #0d9488; padding-bottom: 8px; margin-bottom: 14px; }
         .report-meta-table { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
         .report-meta-table td, .report-meta-table th { padding: 8px 12px; border: 1px solid #e2e8f0; font-size: 0.8rem; }
         .report-meta-table th { background: #f8fafc; font-weight: 700; color: #475569; width: 25%; text-align: left; }
-        .report-section-title { font-size: 0.85rem; font-weight: 800; color: #0f172a; margin: 16px 0 6px 0; text-transform: uppercase; }
+        .report-section-title { font-size: 0.85rem; font-weight: 800; color: #0f172a; margin: 18px 0 6px 0; text-transform: uppercase; }
         .report-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; font-size: 0.82rem; color: #1e293b; line-height: 1.5; white-space: pre-wrap; }
-        .report-img { max-width: 100%; border-radius: 6px; border: 1px solid #cbd5e1; margin-top: 8px; }
+        .report-img-wrapper { border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; margin-top: 10px; }
+        .report-img-wrapper img { width: 100%; display: block; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
       </style>
       </head><body><div class="wrapper">${reportHtml}</div></body></html>`;
 
@@ -699,7 +1018,6 @@
       const desc = document.getElementById('featureDesc').value;
       const steps = document.getElementById('execSteps').value;
       const res = document.getElementById('actualResult').value;
-      const tester = document.getElementById('testerName').value || 'QA Team';
 
       const note = `=====================================================
 TEST EXECUTION REPORT
@@ -710,7 +1028,6 @@ TEST EXECUTION REPORT
 * Tested Module    : ${mod}
 * Test URL         : ${url}
 * Login Reference  : ${login}
-* Tested By        : ${tester}
 -----------------------------------------------------
 DESCRIPTION:
 ${desc}
@@ -735,8 +1052,7 @@ ${res}
         login: document.getElementById('loginRef').value,
         desc: document.getElementById('featureDesc').value,
         steps: document.getElementById('execSteps').value,
-        res: document.getElementById('actualResult').value,
-        tester: document.getElementById('testerName').value
+        res: document.getElementById('actualResult').value
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
@@ -764,7 +1080,6 @@ ${res}
           if (d.desc) document.getElementById('featureDesc').value = d.desc;
           if (d.steps) document.getElementById('execSteps').value = d.steps;
           if (d.res) document.getElementById('actualResult').value = d.res;
-          if (d.tester) document.getElementById('testerName').value = d.tester;
         } catch (e) {}
       }
     };
