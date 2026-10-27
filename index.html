@@ -10,7 +10,7 @@
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-    body { background-color: #f8fafc; color: #1e293b; padding-bottom: 70px; }
+    body { background-color: #f8fafc; color: #1e293b; padding-bottom: 70px; -webkit-font-smoothing: antialiased; }
     
     .material-symbols-rounded {
       font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
@@ -19,19 +19,97 @@
       line-height: 1;
     }
 
-    @keyframes softPulse {
-      0% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.4); }
-      70% { box-shadow: 0 0 0 8px rgba(13, 148, 136, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
+    /* Keyframe Animations for Save Status */
+    @keyframes greenBounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      30% { transform: translateY(-6px) scale(1.25); }
+      50% { transform: translateY(0) scale(0.95); }
+      70% { transform: translateY(-3px) scale(1.12); }
     }
 
-    @keyframes bounceFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
+    @keyframes spinIcon {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulsePending {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.55; transform: scale(0.92); }
+    }
+
+    /* =========================================================
+       CUSTOM HOVER TOOLTIP SYSTEM (Material UI Style)
+       ========================================================= */
+    [data-tooltip] {
+      position: relative;
+    }
+    [data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+      z-index: 999999;
+    }
+    [data-tooltip]::before {
+      content: '';
+      position: absolute;
+      bottom: calc(100% + 3px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      border-width: 5px 5px 0 5px;
+      border-style: solid;
+      border-color: #0f172a transparent transparent transparent;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      z-index: 999999;
+    }
+    [data-tooltip]:hover::after,
+    [data-tooltip]:hover::before {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Tooltip Position Below for Sticky Header Items */
+    .tooltip-bottom[data-tooltip]::after {
+      bottom: auto;
+      top: calc(100% + 8px);
+      transform: translateX(-50%) translateY(-4px);
+    }
+    .tooltip-bottom[data-tooltip]::before {
+      bottom: auto;
+      top: calc(100% + 3px);
+      border-width: 0 5px 5px 5px;
+      border-color: transparent transparent #0f172a transparent;
+      transform: translateX(-50%) translateY(-4px);
+    }
+    .tooltip-bottom[data-tooltip]:hover::after,
+    .tooltip-bottom[data-tooltip]:hover::before {
+      transform: translateX(-50%) translateY(0);
     }
 
     /* Header */
-    header { background: #ffffff; border-bottom: 1px solid #cbd5e1; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+    header { 
+      background: #ffffff; 
+      border-bottom: 1px solid #cbd5e1; 
+      position: sticky; 
+      top: 0; 
+      z-index: 50; 
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03); 
+      transform: translateZ(0);
+    }
     .header-container { max-width: 1050px; margin: 0 auto; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
     
     .brand-wrap { display: flex; align-items: center; gap: 10px; }
@@ -39,38 +117,38 @@
       width: 40px;
       height: 40px;
       border-radius: 10px;
-      background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+      background: #0d9488;
       color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: softPulse 2.5s infinite;
     }
     .brand-avatar .material-symbols-rounded { font-size: 24px; }
     
     .title-area h1 { font-size: 1.25rem; font-weight: 800; color: #0f172a; letter-spacing: -0.3px; }
     .title-area p { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
     
-    /* Action Buttons */
+    /* Icon-Only Action Buttons */
     .btn-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .btn { 
-      padding: 7px 13px; 
-      font-size: 0.75rem; 
-      font-weight: 600; 
-      border-radius: 8px; 
+    .btn-icon { 
+      width: 38px;
+      height: 38px;
+      border-radius: 9px; 
       cursor: pointer; 
       border: 1px solid transparent; 
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+      transition: all 0.15s ease;
       display: inline-flex; 
       align-items: center; 
-      gap: 6px; 
+      justify-content: center;
+      user-select: none;
+      flex-shrink: 0;
     }
-    .btn .material-symbols-rounded { font-size: 16px; }
-    .btn:hover { transform: translateY(-1px); }
-    .btn:active { transform: translateY(0); }
+    .btn-icon .material-symbols-rounded { font-size: 20px; }
+    .btn-icon:hover { transform: translateY(-1px); }
+    .btn-icon:active { transform: translateY(0); }
 
     .btn-slate { background: #ffffff; color: #334155; border-color: #cbd5e1; }
-    .btn-slate:hover { background: #f8fafc; border-color: #94a3b8; }
+    .btn-slate:hover { background: #f8fafc; border-color: #94a3b8; color: #0f172a; }
     .btn-teal { background: #0d9488; color: #ffffff; }
     .btn-teal:hover { background: #0f766e; }
     .btn-blue { background: #2563eb; color: #ffffff; }
@@ -80,25 +158,55 @@
     .btn-danger { background: #fff1f2; color: #e11d48; border-color: #fecdd3; }
     .btn-danger:hover { background: #ffe4e6; }
     
-    .badge-saved { 
-      font-size: 0.72rem; 
-      color: #047857; 
-      background: #ecfdf5; 
-      border: 1px solid #a7f3d0; 
-      padding: 5px 9px; 
-      border-radius: 6px; 
-      font-weight: 600; 
+    /* Dynamic Icon-Only Save Status Badge */
+    .status-badge { 
+      width: 38px;
+      height: 38px;
+      border-radius: 9px; 
       display: inline-flex; 
       align-items: center; 
-      gap: 4px; 
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.25s ease;
     }
-    .badge-saved .material-symbols-rounded { font-size: 14px; animation: bounceFloat 2s infinite ease-in-out; }
+    .status-badge .material-symbols-rounded { font-size: 21px; }
+
+    /* State 1: Unsaved / Pending (Amber) */
+    .status-pending {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+    }
+    .status-pending .material-symbols-rounded {
+      color: #d97706;
+      animation: pulsePending 1.4s infinite ease-in-out;
+    }
+
+    /* State 2: Saving in progress (Blue) */
+    .status-saving {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+    }
+    .status-saving .material-symbols-rounded {
+      color: #2563eb;
+      animation: spinIcon 0.9s infinite linear;
+    }
+
+    /* State 3: Saved (Green with Bounce) */
+    .status-saved { 
+      background: #ecfdf5; 
+      border: 1px solid #a7f3d0; 
+    }
+    .status-saved .material-symbols-rounded { 
+      color: #059669;
+      animation: greenBounce 0.75s cubic-bezier(0.28, 0.84, 0.42, 1);
+    }
 
     /* Layout */
-    .main-container { max-width: 1050px; margin: 24px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 22px; }
+    .main-container { max-width: 1050px; margin: 24px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 20px; }
     
-    /* Input Form Cards */
-    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+    /* Input Cards */
+    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
     .card-title { 
       font-size: 0.95rem; 
       font-weight: 800; 
@@ -142,7 +250,7 @@
     input:focus, select:focus, textarea:focus { border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15); }
     textarea { resize: vertical; line-height: 1.5; }
 
-    .project-row { display: flex; gap: 8px; }
+    .input-action-row { display: flex; gap: 8px; align-items: center; }
 
     /* Screenshot Upload Zones */
     .drop-zone {
@@ -152,15 +260,15 @@
       text-align: center; 
       background: #f8fafc; 
       cursor: pointer; 
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+      transition: background 0.15s ease, border-color 0.15s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 6px;
     }
-    .drop-zone:hover, .drop-zone.dragover { border-color: #0d9488; background: #f0fdfa; transform: scale(1.005); }
-    .drop-zone .upload-icon { font-size: 32px; color: #0d9488; animation: bounceFloat 2.2s infinite ease-in-out; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: #0d9488; background: #f0fdfa; }
+    .drop-zone .upload-icon { font-size: 32px; color: #0d9488; }
     .drop-zone p { font-size: 0.82rem; color: #64748b; pointer-events: none; }
     .drop-zone span { font-size: 0.82rem; color: #0d9488; font-weight: 700; pointer-events: none; }
     
@@ -174,13 +282,12 @@
       border: 1px solid #cbd5e1; 
       background: #f1f5f9;
       cursor: pointer;
+      contain: content;
     }
     .image-preview img { 
       width: 100%; 
       height: 100%; 
       object-fit: cover; 
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: crisp-edges;
     }
     .image-preview .order-badge {
       position: absolute;
@@ -218,16 +325,16 @@
     td { padding: 8px; border-bottom: 1px solid #e2e8f0; }
     .delete-btn { color: #e11d48; background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; }
 
-    /* Modal Overlay (Fixed high z-index and click traps) */
+    /* Modal Overlay */
     .modal-overlay { 
       display: none; 
       position: fixed; 
       inset: 0; 
       background: rgba(15, 23, 42, 0.65); 
-      backdrop-filter: blur(4px);
       z-index: 99999; 
       align-items: center; 
       justify-content: center; 
+      contain: strict;
     }
     .modal-overlay.active { display: flex; }
     .modal-card { 
@@ -235,10 +342,9 @@
       border-radius: 14px; 
       padding: 24px; 
       width: 90%;
-      max-width: 400px; 
+      max-width: 440px; 
       box-shadow: 0 20px 40px rgba(0,0,0,0.25); 
       border: 1px solid #cbd5e1; 
-      position: relative;
     }
 
     /* Preview Modal Window */
@@ -252,7 +358,6 @@
       flex-direction: column;
       box-shadow: 0 25px 50px rgba(0,0,0,0.25);
       overflow: hidden;
-      position: relative;
     }
     .preview-header {
       padding: 14px 20px;
@@ -331,7 +436,6 @@
       border: 1px solid #cbd5e1;
       border-radius: 6px;
       background: #ffffff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
       page-break-inside: avoid;
     }
 
@@ -340,8 +444,6 @@
       height: auto;
       display: block;
       object-fit: contain;
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: crisp-edges;
     }
 
     /* Lightbox Zoom */
@@ -361,14 +463,12 @@
       max-width: 95vw;
       max-height: 95vh;
       border-radius: 6px;
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: crisp-edges;
     }
 
     .bottom-bar {
       display: flex;
       justify-content: center;
-      gap: 12px;
+      gap: 14px;
       margin-top: 12px;
       padding: 16px;
       background: #ffffff;
@@ -412,17 +512,15 @@
         page-break-inside: avoid !important;
         break-inside: avoid !important;
         border: 1px solid #000000 !important;
-        box-shadow: none !important;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Hidden Container for PDF printing -->
   <div id="printableDocArea" style="display:none;"></div>
 
-  <!-- Header -->
+  <!-- Header (Icon-Only Actions with Bottom Hover Tooltips) -->
   <header>
     <div class="header-container">
       <div class="brand-wrap">
@@ -436,26 +534,28 @@
       </div>
       
       <div class="btn-group">
-        <span id="saveStatus" class="badge-saved">
-          <span class="material-symbols-rounded">check_circle</span> Auto-saved
+        <!-- Icon-Only Save Status Badge -->
+        <span id="saveStatus" class="status-badge status-saved tooltip-bottom" onclick="performSaveNow()" data-tooltip="Auto-saved (Click to save now)">
+          <span class="material-symbols-rounded">check_circle</span>
         </span>
-        <button type="button" onclick="resetToDocDefaults()" class="btn btn-danger">
-          <span class="material-symbols-rounded">restart_alt</span> Reset
+
+        <button type="button" onclick="resetToDocDefaults()" class="btn-icon btn-danger tooltip-bottom" data-tooltip="Reset to Defaults">
+          <span class="material-symbols-rounded">restart_alt</span>
         </button>
-        <button type="button" onclick="copyMantisSummary()" class="btn btn-slate">
-          <span class="material-symbols-rounded">content_copy</span> Copy Mantis
+        <button type="button" onclick="copyMantisSummary()" class="btn-icon btn-slate tooltip-bottom" data-tooltip="Copy MantisBT Summary">
+          <span class="material-symbols-rounded">content_copy</span>
         </button>
-        <button type="button" onclick="openPreviewModal()" class="btn btn-purple">
-          <span class="material-symbols-rounded">visibility</span> Preview Report
+        <button type="button" onclick="openPreviewModal()" class="btn-icon btn-purple tooltip-bottom" data-tooltip="Preview Final Report">
+          <span class="material-symbols-rounded">visibility</span>
         </button>
-        <button type="button" onclick="exportToWord()" class="btn btn-blue">
-          <span class="material-symbols-rounded">description</span> Word (.doc)
+        <button type="button" onclick="exportToWord()" class="btn-icon btn-blue tooltip-bottom" data-tooltip="Download Word (.doc)">
+          <span class="material-symbols-rounded">description</span>
         </button>
-        <button type="button" onclick="triggerCleanPdfPrint()" class="btn btn-slate">
-          <span class="material-symbols-rounded">picture_as_pdf</span> PDF / Print
+        <button type="button" onclick="triggerCleanPdfPrint()" class="btn-icon btn-slate tooltip-bottom" data-tooltip="Print / Save as PDF">
+          <span class="material-symbols-rounded">picture_as_pdf</span>
         </button>
-        <button type="button" onclick="downloadReportHtml()" class="btn btn-teal">
-          <span class="material-symbols-rounded">html</span> HTML
+        <button type="button" onclick="downloadReportHtml()" class="btn-icon btn-teal tooltip-bottom" data-tooltip="Export HTML Report">
+          <span class="material-symbols-rounded">html</span>
         </button>
       </div>
     </div>
@@ -473,19 +573,26 @@
         </span>
       </div>
       <div class="grid-2">
+        <!-- Project Name Field with Icon-Only Add Button -->
         <div class="form-group">
           <label>Project Name / Application Name *</label>
-          <div class="project-row">
-            <select id="projectSelect" onchange="autoSave()"></select>
-            <button type="button" onclick="triggerAddProject()" class="btn btn-slate" style="flex-shrink:0;">
-              <span class="material-symbols-rounded">add</span> New
+          <div class="input-action-row">
+            <select id="projectSelect" onchange="onProjectChange()"></select>
+            <button type="button" onclick="triggerAddProject()" class="btn-icon btn-slate" data-tooltip="Add New Project">
+              <span class="material-symbols-rounded">add</span>
             </button>
           </div>
         </div>
 
+        <!-- Tested Module / Feature Names Dropdown with Icon-Only Add Button -->
         <div class="form-group">
           <label>Tested Module / Feature Names *</label>
-          <input type="text" id="moduleNames" value="Staff Management  Staff Attendance Confirmation.">
+          <div class="input-action-row">
+            <select id="moduleSelect" onchange="markUnsaved()"></select>
+            <button type="button" onclick="triggerAddModule()" class="btn-icon btn-slate" data-tooltip="Add New Module / Feature">
+              <span class="material-symbols-rounded">add</span>
+            </button>
+          </div>
         </div>
 
         <div class="form-group">
@@ -574,8 +681,8 @@
           <span class="material-symbols-rounded heading-icon">bug_report</span>
           4. MantisBT Defects Logged
         </span>
-        <button type="button" onclick="addDefectRow()" class="btn btn-slate">
-          <span class="material-symbols-rounded">add_circle</span> Add Mantis Bug
+        <button type="button" onclick="addDefectRow()" class="btn-icon btn-slate" data-tooltip="Add Mantis Bug">
+          <span class="material-symbols-rounded">add_circle</span>
         </button>
       </div>
       <div style="overflow-x: auto;">
@@ -596,22 +703,25 @@
       <p id="noDefectsNotice" style="font-size: 0.75rem; color: #94a3b8; text-align: center; margin-top: 10px;">No defects logged for this ticket.</p>
     </div>
 
-    <!-- Bottom Actions Bar -->
+    <!-- Bottom Icon-Only Actions Bar with Hover Tooltips -->
     <div class="bottom-bar">
-      <button type="button" onclick="openPreviewModal()" class="btn btn-purple" style="padding: 10px 22px; font-size: 0.85rem;">
-        <span class="material-symbols-rounded">visibility</span> Preview Final Report
+      <button type="button" onclick="openPreviewModal()" class="btn-icon btn-purple" style="width:44px; height:44px;" data-tooltip="Preview Final Report">
+        <span class="material-symbols-rounded" style="font-size:22px;">visibility</span>
       </button>
-      <button type="button" onclick="exportToWord()" class="btn btn-blue" style="padding: 10px 20px; font-size: 0.85rem;">
-        <span class="material-symbols-rounded">description</span> Word (.doc)
+      <button type="button" onclick="exportToWord()" class="btn-icon btn-blue" style="width:44px; height:44px;" data-tooltip="Download Word (.doc)">
+        <span class="material-symbols-rounded" style="font-size:22px;">description</span>
       </button>
-      <button type="button" onclick="triggerCleanPdfPrint()" class="btn btn-slate" style="padding: 10px 20px; font-size: 0.85rem;">
-        <span class="material-symbols-rounded">picture_as_pdf</span> PDF / Print
+      <button type="button" onclick="triggerCleanPdfPrint()" class="btn-icon btn-slate" style="width:44px; height:44px;" data-tooltip="Print / Save as PDF">
+        <span class="material-symbols-rounded" style="font-size:22px;">picture_as_pdf</span>
+      </button>
+      <button type="button" onclick="downloadReportHtml()" class="btn-icon btn-teal" style="width:44px; height:44px;" data-tooltip="Export HTML Report">
+        <span class="material-symbols-rounded" style="font-size:22px;">html</span>
       </button>
     </div>
 
   </main>
 
-  <!-- Interactive Add Project Modal -->
+  <!-- Add Project Modal -->
   <div class="modal-overlay" id="projectModal">
     <div class="modal-card">
       <h3 style="font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
@@ -619,16 +729,45 @@
       </h3>
       <div class="form-group">
         <label>Project / Application Name *</label>
-        <input type="text" id="newProjectInput" placeholder="e.g. JNB-Hostel Portal" onkeydown="if(event.key==='Enter') saveNewProject();">
+        <input type="text" id="newProjectInput" placeholder="e.g. JNB-Hostel Application" onkeydown="if(event.key==='Enter') saveNewProject();">
       </div>
-      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
-        <button type="button" onclick="closeProjectModal()" class="btn btn-slate">Cancel</button>
-        <button type="button" onclick="saveNewProject()" class="btn btn-teal">Save Project</button>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px;">
+        <button type="button" onclick="closeProjectModal()" class="btn-icon btn-slate" data-tooltip="Cancel">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+        <button type="button" onclick="saveNewProject()" class="btn-icon btn-teal" data-tooltip="Save Project">
+          <span class="material-symbols-rounded">check</span>
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Interactive Live Preview Modal -->
+  <!-- Add Module Modal -->
+  <div class="modal-overlay" id="moduleModal">
+    <div class="modal-card">
+      <h3 style="font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+        <span class="material-symbols-rounded" style="color:#0d9488;">post_add</span> Add New Module / Feature
+      </h3>
+      <div class="form-group" style="margin-bottom: 10px;">
+        <label>For Project:</label>
+        <input type="text" id="moduleModalProjectName" disabled style="background:#f1f5f9; color:#475569; font-weight:600;">
+      </div>
+      <div class="form-group">
+        <label>Module / Feature Name *</label>
+        <input type="text" id="newModuleInput" placeholder="e.g. Staff Management  Staff Attendance Confirmation." onkeydown="if(event.key==='Enter') saveNewModule();">
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px;">
+        <button type="button" onclick="closeModuleModal()" class="btn-icon btn-slate" data-tooltip="Cancel">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+        <button type="button" onclick="saveNewModule()" class="btn-icon btn-teal" data-tooltip="Save Module">
+          <span class="material-symbols-rounded">check</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview Modal (Icon-Only Actions) -->
   <div class="modal-overlay" id="previewModal">
     <div class="preview-modal-card">
       <div class="preview-header">
@@ -636,16 +775,16 @@
           <span class="material-symbols-rounded" style="color:#7c3aed;">description</span> Verify Report Preview
         </h3>
         <div style="display:flex; gap:8px;">
-          <button type="button" onclick="exportToWord()" class="btn btn-blue">
-            <span class="material-symbols-rounded">description</span> Word
+          <button type="button" onclick="exportToWord()" class="btn-icon btn-blue tooltip-bottom" data-tooltip="Download Word (.doc)">
+            <span class="material-symbols-rounded">description</span>
           </button>
-          <button type="button" onclick="triggerCleanPdfPrint()" class="btn btn-slate">
-            <span class="material-symbols-rounded">picture_as_pdf</span> PDF
+          <button type="button" onclick="triggerCleanPdfPrint()" class="btn-icon btn-slate tooltip-bottom" data-tooltip="Print / Save as PDF">
+            <span class="material-symbols-rounded">picture_as_pdf</span>
           </button>
-          <button type="button" onclick="downloadReportHtml()" class="btn btn-teal">
-            <span class="material-symbols-rounded">html</span> HTML
+          <button type="button" onclick="downloadReportHtml()" class="btn-icon btn-teal tooltip-bottom" data-tooltip="Export HTML Report">
+            <span class="material-symbols-rounded">html</span>
           </button>
-          <button type="button" onclick="closePreviewModal()" class="btn btn-danger">
+          <button type="button" onclick="closePreviewModal()" class="btn-icon btn-danger tooltip-bottom" data-tooltip="Close Preview">
             <span class="material-symbols-rounded">close</span>
           </button>
         </div>
@@ -660,8 +799,9 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'jnb_report_data_v4';
-    const PROJECTS_KEY = 'qa_projects_list_v4';
+    const STORAGE_KEY = 'jnb_report_optimized_v4';
+    const PROJECTS_KEY = 'qa_projects_list_v7';
+    const MODULES_MAP_KEY = 'qa_project_modules_map_v3';
 
     const defaultProjects = [
       "JNB-Nivas Web Application.",
@@ -669,11 +809,113 @@
       "APCFSS Portal"
     ];
 
+    const defaultModulesMap = {
+      "JNB-Nivas Web Application.": [
+        "Staff Management  Staff Attendance Confirmation.",
+        "Reports New --> Item Wise Purchase report"
+      ],
+      "JNB-Hostel Application": [
+        "Student Registration & Allocation",
+        "Biometric Attendance Tracking"
+      ],
+      "APCFSS Portal": [
+        "User Access Management",
+        "Role Based Service Allocation"
+      ]
+    };
+
     let prodImages = [];
     let execImages = [];
     let activeDropTarget = 'exec';
+    let isDirty = false;
+    let autoSaveTimer = null;
 
-    // 1. Bulletproof Project Loader
+    // =========================================================
+    // 1. 30-SECOND AUTO-SAVE & ICON-ONLY STATE MACHINE
+    // =========================================================
+    function setBadgeState(state) {
+      const badge = document.getElementById('saveStatus');
+      badge.className = 'status-badge tooltip-bottom';
+
+      if (state === 'pending') {
+        badge.classList.add('status-pending');
+        badge.setAttribute('data-tooltip', 'Unsaved changes (Auto-saves in 30s or click now)');
+        badge.innerHTML = '<span class="material-symbols-rounded">pending</span>';
+      } else if (state === 'saving') {
+        badge.classList.add('status-saving');
+        badge.setAttribute('data-tooltip', 'Saving changes...');
+        badge.innerHTML = '<span class="material-symbols-rounded">sync</span>';
+      } else if (state === 'saved') {
+        void badge.offsetWidth; // trigger bounce animation reflow
+        badge.classList.add('status-saved');
+        badge.setAttribute('data-tooltip', 'Auto-saved (Click to save now)');
+        badge.innerHTML = '<span class="material-symbols-rounded">check_circle</span>';
+      }
+    }
+
+    function markUnsaved() {
+      isDirty = true;
+      setBadgeState('pending');
+
+      if (!autoSaveTimer) {
+        autoSaveTimer = setTimeout(() => {
+          performSaveNow();
+        }, 30000); // 30 seconds
+      }
+    }
+
+    function performSaveNow() {
+      if (autoSaveTimer) {
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = null;
+      }
+
+      setBadgeState('saving');
+
+      setTimeout(() => {
+        const defectRows = [];
+        document.querySelectorAll('#defectTableBody tr').forEach(tr => {
+          defectRows.push({
+            id: tr.querySelector('.d-id')?.value || '',
+            sev: tr.querySelector('.d-sev')?.value || 'minor',
+            pri: tr.querySelector('.d-pri')?.value || 'normal',
+            desc: tr.querySelector('.d-desc')?.value || '',
+            status: tr.querySelector('.d-status')?.value || 'resolved'
+          });
+        });
+
+        const data = {
+          project: document.getElementById('projectSelect').value,
+          module: document.getElementById('moduleSelect').value,
+          mantisId: document.getElementById('mantisId').value,
+          build: document.getElementById('buildVersion').value,
+          url: document.getElementById('testUrl').value,
+          login: document.getElementById('loginRef').value,
+          desc: document.getElementById('featureDesc').value,
+          steps: document.getElementById('execSteps').value,
+          res: document.getElementById('actualResult').value,
+          defects: defectRows
+        };
+
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+          isDirty = false;
+          setBadgeState('saved');
+        } catch (e) {
+          console.warn('Storage error');
+        }
+      }, 250);
+    }
+
+    setInterval(() => {
+      if (isDirty) {
+        performSaveNow();
+      }
+    }, 30000);
+
+    // =========================================================
+    // 2. PROJECT & MODULE MANAGEMENT
+    // =========================================================
     function getStoredProjects() {
       try {
         const stored = localStorage.getItem(PROJECTS_KEY);
@@ -681,10 +923,19 @@
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         }
-      } catch (e) {
-        console.error("Storage read error", e);
-      }
+      } catch (e) {}
       return [...defaultProjects];
+    }
+
+    function getStoredModulesMap() {
+      try {
+        const stored = localStorage.getItem(MODULES_MAP_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && typeof parsed === 'object') return parsed;
+        }
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(defaultModulesMap));
     }
 
     function populateProjectDropdown(selectedProject = null) {
@@ -693,12 +944,14 @@
       const currentVal = selectedProject || select.value || projects[0];
 
       select.innerHTML = '';
+      const fragment = document.createDocumentFragment();
       projects.forEach(p => {
         const opt = document.createElement('option');
         opt.value = p;
         opt.textContent = p;
-        select.appendChild(opt);
+        fragment.appendChild(opt);
       });
+      select.appendChild(fragment);
 
       if (projects.includes(currentVal)) {
         select.value = currentVal;
@@ -707,11 +960,47 @@
       }
     }
 
+    function populateModuleDropdown(selectedModule = null) {
+      const currentProject = document.getElementById('projectSelect').value;
+      const modulesMap = getStoredModulesMap();
+      const modules = modulesMap[currentProject] || [];
+      const select = document.getElementById('moduleSelect');
+      
+      select.innerHTML = '';
+      const fragment = document.createDocumentFragment();
+      
+      if (modules.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = "";
+        opt.textContent = "-- No modules added (Click + Icon) --";
+        fragment.appendChild(opt);
+      } else {
+        modules.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m;
+          opt.textContent = m;
+          fragment.appendChild(opt);
+        });
+      }
+      select.appendChild(fragment);
+
+      if (selectedModule && modules.includes(selectedModule)) {
+        select.value = selectedModule;
+      } else if (modules.length > 0) {
+        select.value = modules[0];
+      }
+    }
+
+    function onProjectChange() {
+      populateModuleDropdown();
+      markUnsaved();
+    }
+
     function triggerAddProject() {
       const modal = document.getElementById('projectModal');
       const input = document.getElementById('newProjectInput');
       modal.classList.add('active');
-      setTimeout(() => input.focus(), 100);
+      setTimeout(() => input.focus(), 60);
     }
 
     function closeProjectModal() {
@@ -735,17 +1024,64 @@
         localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
       }
 
+      let map = getStoredModulesMap();
+      if (!map[val]) {
+        map[val] = [];
+        localStorage.setItem(MODULES_MAP_KEY, JSON.stringify(map));
+      }
+
       closeProjectModal();
       populateProjectDropdown(val);
-      autoSave();
+      populateModuleDropdown();
+      performSaveNow();
     }
 
-    // 2. Images Processing
+    function triggerAddModule() {
+      const currentProject = document.getElementById('projectSelect').value;
+      document.getElementById('moduleModalProjectName').value = currentProject;
+      const modal = document.getElementById('moduleModal');
+      const input = document.getElementById('newModuleInput');
+      modal.classList.add('active');
+      setTimeout(() => input.focus(), 60);
+    }
+
+    function closeModuleModal() {
+      document.getElementById('moduleModal').classList.remove('active');
+      document.getElementById('newModuleInput').value = '';
+    }
+
+    function saveNewModule() {
+      const currentProject = document.getElementById('projectSelect').value;
+      const input = document.getElementById('newModuleInput');
+      const val = (input.value || '').trim();
+
+      if (!val) {
+        alert('Please enter a module or feature name.');
+        input.focus();
+        return;
+      }
+
+      let map = getStoredModulesMap();
+      if (!map[currentProject]) map[currentProject] = [];
+
+      if (!map[currentProject].includes(val)) {
+        map[currentProject].push(val);
+        localStorage.setItem(MODULES_MAP_KEY, JSON.stringify(map));
+      }
+
+      closeModuleModal();
+      populateModuleDropdown(val);
+      performSaveNow();
+    }
+
+    // =========================================================
+    // 3. SCREENSHOT PROCESSING
+    // =========================================================
     function readFileAsDataURL(file) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = (err) => reject(err);
+        reader.onerror = () => resolve(null);
         reader.readAsDataURL(file);
       });
     }
@@ -753,18 +1089,21 @@
     async function processFiles(files, targetType) {
       if (!files || !files.length) return;
       const validFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+      
       for (const file of validFiles) {
-        try {
-          const dataUrl = await readFileAsDataURL(file);
+        const dataUrl = await readFileAsDataURL(file);
+        if (dataUrl) {
           if (targetType === 'prod') {
             prodImages.push(dataUrl);
           } else {
             execImages.push(dataUrl);
           }
-        } catch (err) {}
+        }
       }
-      renderImages('prod');
-      renderImages('exec');
+      requestAnimationFrame(() => {
+        renderImages('prod');
+        renderImages('exec');
+      });
     }
 
     function bindDropZone(zoneId, inputId, type) {
@@ -789,7 +1128,6 @@
 
       zone.addEventListener('dragover', (e) => {
         e.preventDefault();
-        zone.classList.add('dragover');
       });
 
       zone.addEventListener('dragleave', (e) => {
@@ -810,10 +1148,9 @@
     bindDropZone('prodDropZone', 'prodFileInput', 'prod');
     bindDropZone('execDropZone', 'execFileInput', 'exec');
 
-    // Clipboard Paste Handler
     window.addEventListener('paste', (e) => {
-      const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
-      if (activeTag === 'textarea' || (activeTag === 'input' && document.activeElement.type === 'text')) {
+      const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+      if (tag === 'textarea' || (tag === 'input' && document.activeElement.type === 'text')) {
         return;
       }
 
@@ -840,18 +1177,21 @@
       const grid = document.getElementById(type === 'prod' ? 'prodImageGrid' : 'execImageGrid');
       const list = type === 'prod' ? prodImages : execImages;
       grid.innerHTML = '';
+      
+      const fragment = document.createDocumentFragment();
       list.forEach((src, idx) => {
         const div = document.createElement('div');
         div.className = 'image-preview';
         div.innerHTML = `
           <span class="order-badge">#${idx + 1}</span>
-          <img src="${src}" onclick="openZoom('${src}')">
-          <button type="button" title="Remove screenshot" onclick="removeImage('${type}', ${idx}, event)">
+          <img src="${src}" onclick="openZoom('${src}')" loading="lazy">
+          <button type="button" data-tooltip="Remove Screenshot" onclick="removeImage('${type}', ${idx}, event)">
             <span class="material-symbols-rounded">close</span>
           </button>
         `;
-        grid.appendChild(div);
+        fragment.appendChild(div);
       });
+      grid.appendChild(fragment);
     }
 
     function removeImage(type, idx, event) {
@@ -866,8 +1206,10 @@
       document.getElementById('zoomOverlay').classList.add('active');
     }
 
-    // 3. Defects Table Handling
-    function addDefectRow(data = {}) {
+    // =========================================================
+    // 4. DEFECTS TABLE
+    // =========================================================
+    function addDefectRow(data = {}, skipDirty = false) {
       document.getElementById('noDefectsNotice').style.display = 'none';
       const tr = document.createElement('tr');
       tr.innerHTML = `
@@ -896,27 +1238,29 @@
           </select>
         </td>
         <td style="text-align:center;">
-          <button type="button" class="delete-btn" onclick="this.closest('tr').remove(); checkDefectCount();">
+          <button type="button" class="delete-btn" data-tooltip="Delete Row" onclick="this.closest('tr').remove(); checkDefectCount();">
             <span class="material-symbols-rounded">delete</span>
           </button>
         </td>
       `;
       document.getElementById('defectTableBody').appendChild(tr);
-      tr.querySelectorAll('input, select').forEach(el => el.addEventListener('input', autoSave));
-      autoSave();
+      tr.querySelectorAll('input, select').forEach(el => el.addEventListener('input', markUnsaved));
+      if (!skipDirty) markUnsaved();
     }
 
-    function checkDefectCount() {
+    function checkDefectCount(skipDirty = false) {
       if (document.querySelectorAll('#defectTableBody tr').length === 0) {
         document.getElementById('noDefectsNotice').style.display = 'block';
       }
-      autoSave();
+      if (!skipDirty) markUnsaved();
     }
 
-    // 4. Exact Document HTML Builder
+    // =========================================================
+    // 5. DOCUMENT EXPORT & PREVIEW BUILDERS
+    // =========================================================
     function buildExactDocFormatHtml() {
       const p = document.getElementById('projectSelect').value;
-      const mod = document.getElementById('moduleNames').value;
+      const mod = document.getElementById('moduleSelect').value;
       const url = document.getElementById('testUrl').value;
       const login = document.getElementById('loginRef').value;
       const desc = document.getElementById('featureDesc').value;
@@ -978,12 +1322,12 @@
         window.print();
         printable.style.display = 'none';
         printable.innerHTML = '';
-      }, 120);
+      }, 100);
     }
 
     function exportToWord() {
       const p = document.getElementById('projectSelect').value;
-      const mod = document.getElementById('moduleNames').value;
+      const mod = document.getElementById('moduleSelect').value;
       const url = document.getElementById('testUrl').value;
       const login = document.getElementById('loginRef').value;
       const desc = document.getElementById('featureDesc').value;
@@ -1061,7 +1405,7 @@
       const p = document.getElementById('projectSelect').value;
       const mId = document.getElementById('mantisId').value || 'N/A';
       const bVer = document.getElementById('buildVersion').value;
-      const mod = document.getElementById('moduleNames').value;
+      const mod = document.getElementById('moduleSelect').value;
       const url = document.getElementById('testUrl').value;
       const login = document.getElementById('loginRef').value;
       const desc = document.getElementById('featureDesc').value;
@@ -1091,56 +1435,27 @@ ${res}
       navigator.clipboard.writeText(note).then(() => alert('Copied MantisBT Note to clipboard!'));
     }
 
-    // 5. Robust Auto-Save
-    function autoSave() {
-      const defectRows = [];
-      document.querySelectorAll('#defectTableBody tr').forEach(tr => {
-        defectRows.push({
-          id: tr.querySelector('.d-id')?.value || '',
-          sev: tr.querySelector('.d-sev')?.value || 'minor',
-          pri: tr.querySelector('.d-pri')?.value || 'normal',
-          desc: tr.querySelector('.d-desc')?.value || '',
-          status: tr.querySelector('.d-status')?.value || 'resolved'
-        });
-      });
-
-      const data = {
-        project: document.getElementById('projectSelect').value,
-        module: document.getElementById('moduleNames').value,
-        mantisId: document.getElementById('mantisId').value,
-        build: document.getElementById('buildVersion').value,
-        url: document.getElementById('testUrl').value,
-        login: document.getElementById('loginRef').value,
-        desc: document.getElementById('featureDesc').value,
-        steps: document.getElementById('execSteps').value,
-        res: document.getElementById('actualResult').value,
-        defects: defectRows
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-
-    setInterval(autoSave, 4000);
-    document.querySelectorAll('input, select, textarea').forEach(el => el.addEventListener('input', autoSave));
-
     function resetToDocDefaults() {
       if (confirm('Are you sure you want to reset to document defaults?')) {
         localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(MODULES_MAP_KEY);
+        localStorage.removeItem(PROJECTS_KEY);
         location.reload();
       }
     }
 
-    // 6. Complete Initialization
+    // 6. Initialization
     window.onload = function() {
-      const savedDataRaw = localStorage.getItem(STORAGE_KEY);
       let parsed = null;
-      if (savedDataRaw) {
-        try { parsed = JSON.parse(savedDataRaw); } catch (e) {}
-      }
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) parsed = JSON.parse(saved);
+      } catch (e) {}
 
       populateProjectDropdown(parsed?.project || null);
+      populateModuleDropdown(parsed?.module || null);
 
       if (parsed) {
-        if (parsed.module) document.getElementById('moduleNames').value = parsed.module;
         if (parsed.mantisId) document.getElementById('mantisId').value = parsed.mantisId;
         if (parsed.build) document.getElementById('buildVersion').value = parsed.build;
         if (parsed.url) document.getElementById('testUrl').value = parsed.url;
@@ -1150,10 +1465,14 @@ ${res}
         if (parsed.res) document.getElementById('actualResult').value = parsed.res;
 
         if (Array.isArray(parsed.defects) && parsed.defects.length > 0) {
-          parsed.defects.forEach(df => addDefectRow(df));
+          parsed.defects.forEach(df => addDefectRow(df, true));
         }
       }
-      checkDefectCount();
+      checkDefectCount(true);
+
+      document.querySelectorAll('#mantisId, #buildVersion, #testUrl, #loginRef, #featureDesc, #actualResult, #execSteps').forEach(el => {
+        el.addEventListener('input', markUnsaved);
+      });
     };
   </script>
 </body>
