@@ -1,650 +1,254 @@
-<!-- ... existing code ... -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap justify-between items-center gap-4">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center text-2xl shadow-md shadow-teal-500/20">
-          <i class="ph ph-file-text"></i>
-        </div>
-        <div>
-          <h1 class="text-xl font-bold text-slate-900 tracking-tight">Test Execution Report Generator</h1>
-          <p class="text-xs text-slate-500 font-medium">Standard QA Verification & MantisBT Documentation</p>
-        </div>
-      </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QA Execution Report - JNB-Nivas</title>
+  <!-- Inbuilt Pure CSS - Zero CDN dependency, works everywhere -->
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: #f8fafc; color: #1e293b; padding-bottom: 50px; }
+    
+    /* Header */
+    header { background: #ffffff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .header-container { max-width: 1000px; margin: 0 auto; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .title-area h1 { font-size: 1.25rem; font-weight: 700; color: #0f172a; }
+    .title-area p { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+    
+    /* Action Buttons */
+    .btn-group { display: flex; gap: 8px; align-items: center; }
+    .btn { padding: 6px 12px; font-size: 0.75rem; font-weight: 600; border-radius: 6px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+    .btn-slate { background: #f1f5f9; color: #334155; border-color: #cbd5e1; }
+    .btn-slate:hover { background: #e2e8f0; }
+    .btn-teal { background: #0d9488; color: #ffffff; }
+    .btn-teal:hover { background: #0f766e; }
+    .btn-danger { background: #fff1f2; color: #e11d48; border-color: #fecdd3; }
+    .btn-danger:hover { background: #ffe4e6; }
+    .badge-saved { font-size: 0.75rem; color: #059669; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 4px 8px; border-radius: 6px; font-weight: 500; }
 
-      <div class="flex items-center gap-2">
-        <span id="saveStatus" class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 flex items-center gap-1">
-          <i class="ph ph-floppy-disk"></i> Auto-saved
-        </span>
-        <button type="button" onclick="resetToDocDefaults()" class="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-slate-200 transition">
-          Reset to Document
-        </button>
-        <button type="button" onclick="copyMantisSummary()" class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition flex items-center gap-1">
-          <i class="ph ph-copy"></i> Copy Mantis Note
-        </button>
-        <button type="button" onclick="downloadReport()" class="px-4 py-1.5 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-sm shadow-teal-500/30 transition flex items-center gap-1.5">
-          <i class="ph ph-file-html"></i> Export HTML Report
-        </button>
+    /* Layout */
+    .main-container { max-width: 1000px; margin: 24px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 20px; }
+    
+    /* Cards */
+    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+    .card-title { font-size: 0.95rem; font-weight: 700; color: #0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    
+    /* Form Grid */
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    label { font-size: 0.75rem; font-weight: 600; color: #475569; }
+    input[type="text"], select, textarea {
+      width: 100%; padding: 8px 12px; font-size: 0.82rem; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: #ffffff; color: #1e293b;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15); }
+    textarea { resize: vertical; line-height: 1.4; }
+
+    /* Project add row */
+    .project-row { display: flex; gap: 6px; }
+
+    /* Screenshot Upload Zones */
+    .drop-zone {
+      border: 2px dashed #cbd5e1; border-radius: 8px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; transition: 0.2s;
+    }
+    .drop-zone:hover, .drop-zone.dragover { border-color: #0d9488; background: #f0fdfa; }
+    .drop-zone p { font-size: 0.8rem; color: #64748b; }
+    .drop-zone span { font-size: 0.75rem; color: #0d9488; font-weight: 600; }
+    
+    /* Previews */
+    .image-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+    .image-preview { position: relative; width: 110px; height: 80px; border-radius: 6px; overflow: hidden; border: 1px solid #cbd5e1; }
+    .image-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .image-preview button { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; }
+
+    /* Mantis Defect Table */
+    table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-top: 8px; }
+    th { background: #f8fafc; color: #475569; font-weight: 600; text-align: left; padding: 8px; border-bottom: 1px solid #e2e8f0; }
+    td { padding: 8px; border-bottom: 1px solid #f1f5f9; }
+    .delete-btn { color: #e11d48; background: none; border: none; cursor: pointer; font-weight: bold; }
+
+    /* Modal */
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+    .modal.active { display: flex; }
+    .modal-box { background: white; border-radius: 10px; padding: 20px; width: 340px; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="title-area">
+        <h1>Test Execution Report Generator</h1>
+        <p>Standard QA Verification & MantisBT Documentation</p>
+      </div>
+      <div class="btn-group">
+        <span id="saveStatus" class="badge-saved">💾 Auto-saved</span>
+        <button type="button" onclick="resetToDocDefaults()" class="btn btn-danger">Reset</button>
+        <button type="button" onclick="copyMantisSummary()" class="btn btn-slate">Copy Mantis Note</button>
+        <button type="button" onclick="downloadReport()" class="btn btn-teal">Export HTML Report</button>
       </div>
     </div>
   </header>
 
-  <!-- Main Container -->
-  <main class="max-w-5xl mx-auto px-4 sm:px-6 mt-8 space-y-6">
+  <!-- Main Content -->
+  <main class="main-container">
 
-    <!-- Card 1: Application & Build Details -->
-    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-      <div class="flex items-center gap-2 mb-4 text-slate-900 font-semibold text-base border-b border-slate-100 pb-3">
-        <i class="ph ph-desktop text-teal-600 text-lg"></i> Application & Build Details
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- 1. Project Name with Dynamic Add Feature -->
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <label class="block text-xs font-medium text-slate-600">Project Name / Application Name *</label>
-            <button type="button" onclick="openNewProjectPrompt()" class="text-[11px] font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-0.5">
-              <i class="ph ph-plus-circle text-xs"></i> New Project
-            </button>
-          </div>
-          <div class="flex gap-1.5">
-            <select id="projectSelect" onchange="handleProjectChange()" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white">
-              <!-- Populated dynamically via JS -->
-            </select>
+    <!-- Card 1: Application Details -->
+    <div class="card">
+      <div class="card-title">Application & Build Details</div>
+      <div class="grid-2">
+        
+        <!-- Project Name with + New Button -->
+        <div class="form-group">
+          <label>Project Name / Application Name *</label>
+          <div class="project-row">
+            <select id="projectSelect" onchange="autoSave()"></select>
+            <button type="button" onclick="openProjectModal()" class="btn btn-slate">+ New</button>
           </div>
         </div>
 
-        <!-- 2. Tested Module / Feature Names (Reordered immediately after Project Name) -->
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Tested Module / Feature Names *</label>
-          <input type="text" id="moduleNames" value="Staff Management -> Staff Attendance Confirmation" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
+        <!-- Module Names (Right after Project Name) -->
+        <div class="form-group">
+          <label>Tested Module / Feature Names *</label>
+          <input type="text" id="moduleNames" value="Staff Management -> Staff Attendance Confirmation">
         </div>
 
-        <!-- 3. MantisBT Issue ID -->
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">MantisBT Issue ID / Ticket *</label>
-          <input type="text" id="mantisId" placeholder="e.g. #001248" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
+        <div class="form-group">
+          <label>MantisBT Issue ID / Ticket *</label>
+          <input type="text" id="mantisId" placeholder="e.g. #001248">
         </div>
 
-        <!-- 4. Build Version -->
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Build Version *</label>
-          <input type="text" id="buildVersion" placeholder="e.g. v2.4.1 / Release-52" value="Release-52" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
+        <div class="form-group">
+          <label>Build Version *</label>
+          <input type="text" id="buildVersion" value="Release-52">
         </div>
 
-        <!-- 5. Test URL -->
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Test URL</label>
-          <input type="text" id="testUrl" value="jnbnivas.dev.nidhi.apcfss.in" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
+        <div class="form-group">
+          <label>Test URL</label>
+          <input type="text" id="testUrl" value="jnbnivas.dev.nidhi.apcfss.in">
         </div>
 
-        <!-- 6. Login Reference -->
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Login / Credentials Reference</label>
-          <input type="text" id="loginRef" value="52" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
+        <div class="form-group">
+          <label>Login / Credentials Reference</label>
+          <input type="text" id="loginRef" value="52">
         </div>
       </div>
     </div>
 
-    <!-- Modal for adding new project -->
-    <div id="newProjectModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 space-y-4">
-        <div class="flex items-center justify-between border-b pb-2.5">
-          <h3 class="text-sm font-bold text-slate-800">Add New Project</h3>
-          <button type="button" onclick="closeNewProjectPrompt()" class="text-slate-400 hover:text-slate-600">
-            <i class="ph ph-x text-base"></i>
-          </button>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Project / Application Name</label>
-          <input type="text" id="newProjectInput" placeholder="e.g. JNB-Hostel Portal" class="w-full text-sm px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
-        </div>
-        <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeNewProjectPrompt()" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100">Cancel</button>
-          <button type="button" onclick="saveNewProject()" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-teal-600 hover:bg-teal-700 text-white shadow-sm">Save Project</button>
-        </div>
+    <!-- Card 2: Scope & Execution Steps -->
+    <div class="card">
+      <div class="card-title">Scope & Execution Details</div>
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label>Detailed Description about Features/Services Tested</label>
+        <textarea id="featureDesc" rows="3">Previously, the "Principal" designation was missing from the Staff Attendance Confirmation service in Production. Per the latest department requirements, added the "Principal" designation and validated its presence and functionality on the attendance confirmation screen.</textarea>
       </div>
-    </div>
 
-    <!-- Card 2: Test Scope, Execution Steps & Verification -->
-    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-      <div class="flex items-center gap-2 mb-4 text-slate-900 font-semibold text-base border-b border-slate-100 pb-3">
-        <i class="ph ph-list-checks text-teal-600 text-lg"></i> Scope & Execution Details
-      </div>
-      <div class="space-y-4">
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Detailed Description about Features/Services Tested</label>
-          <textarea id="featureDesc" rows="3" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-normal leading-relaxed">Previously, the "Principal" designation was missing from the Staff Attendance Confirmation service in Production. Per the latest department requirements, added the "Principal" designation and validated its presence and functionality on the attendance confirmation screen.</textarea>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Execution Steps</label>
-          <textarea id="execSteps" rows="3" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-normal leading-relaxed">1. Navigate to the URL: JNB - Nivas Web Application
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label>Execution Steps</label>
+        <textarea id="execSteps" rows="3">1. Navigate to the URL: JNB - Nivas Web Application
 2. Login as mentioned user, navigate to “Staff Management -> Staff Attendance Confirmation”, verify the presence of the "Principal" designation, check the record, select values and click “Confirm”.</textarea>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Actual Result</label>
+          <input type="text" id="actualResult" value="Functioning as Expected." style="color: #059669; font-weight: 600;">
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-medium text-slate-600 mb-1">Actual Result</label>
-            <input type="text" id="actualResult" value="Functioning as Expected." class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-medium text-emerald-700">
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-600 mb-1">Tested By / Tester Name</label>
-            <input type="text" id="testerName" placeholder="Your Name" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
-          </div>
+        <div class="form-group">
+          <label>Tested By / Tester Name</label>
+          <input type="text" id="testerName" placeholder="Your Name">
         </div>
       </div>
     </div>
 
-    <!-- Card 3: Dedicated Screenshots Section -->
-    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
-      <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
-        <i class="ph ph-image text-teal-600 text-lg"></i>
-        <h2 class="text-slate-900 font-semibold text-base">Screenshot References & Test Evidence</h2>
+    <!-- Card 3: Screenshot References & Test Evidence -->
+    <div class="card">
+      <div class="card-title">Screenshot References & Test Evidence</div>
+      
+      <!-- Zone 1: Production Screenshot Reference -->
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label>1. Production Screenshot Reference (Drag & Drop, Paste Ctrl+V, or Browse)</label>
+        <div class="drop-zone" id="prodDropZone" onclick="document.getElementById('prodFileInput').click()">
+          <p>Click to Browse or <span>Drag & Drop / Paste (Ctrl+V)</span> Production Screenshot</p>
+          <input type="file" id="prodFileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event, 'prod')">
+        </div>
+        <div class="image-grid" id="prodImageGrid"></div>
       </div>
 
-      <!-- Sub-section A: Production Screenshot Reference -->
-      <div class="space-y-3">
-        <div class="flex items-center justify-between">
-          <label class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-amber-500"></span> Production Screenshot Reference
-          </label>
-          <span class="text-[11px] text-slate-400">Supports Drag & Drop, File Browse, or Paste (Ctrl+V)</span>
+      <!-- Zone 2: Execution Screenshots / Evidence -->
+      <div class="form-group">
+        <label>2. Test Execution Screenshots / Verified Evidence</label>
+        <div class="drop-zone" id="execDropZone" onclick="document.getElementById('execFileInput').click()">
+          <p>Click to Browse or <span>Drag & Drop / Paste (Ctrl+V)</span> Execution Evidence</p>
+          <input type="file" id="execFileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event, 'exec')">
         </div>
-        <div id="prodDropZone" tabindex="0" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'prod')" class="border-2 border-dashed border-slate-300 rounded-xl p-5 text-center bg-slate-50/50 hover:bg-slate-50/80 transition cursor-pointer focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10">
-          <input type="file" id="prodFileInput" accept="image/*" multiple class="hidden" onchange="handleFileSelect(event, 'prod')">
-          <i class="ph ph-cloud-arrow-up text-3xl text-slate-400 mb-2"></i>
-          <p class="text-xs font-medium text-slate-600">Drag & Drop Production reference images, <button type="button" onclick="document.getElementById('prodFileInput').click()" class="text-teal-600 underline font-semibold">browse files</button>, or click & paste (Ctrl+V)</p>
-          <p class="text-[10px] text-slate-400 mt-1">PNG, JPG, WebP supported</p>
-        </div>
-        <!-- Thumbnails Container -->
-        <div id="prodPreviews" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-1"></div>
-      </div>
-
-      <!-- Sub-section B: Execution Evidence / Screenshots -->
-      <div class="space-y-3 pt-4 border-t border-slate-100">
-        <div class="flex items-center justify-between">
-          <label class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Test Execution Evidence / Screenshots
-          </label>
-          <span class="text-[11px] text-slate-400">Supports Drag & Drop, File Browse, or Paste (Ctrl+V)</span>
-        </div>
-        <div id="execDropZone" tabindex="0" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'exec')" class="border-2 border-dashed border-slate-300 rounded-xl p-5 text-center bg-slate-50/50 hover:bg-slate-50/80 transition cursor-pointer focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10">
-          <input type="file" id="execFileInput" accept="image/*" multiple class="hidden" onchange="handleFileSelect(event, 'exec')">
-          <i class="ph ph-camera text-3xl text-slate-400 mb-2"></i>
-          <p class="text-xs font-medium text-slate-600">Drag & Drop Execution evidence screenshots, <button type="button" onclick="document.getElementById('execFileInput').click()" class="text-teal-600 underline font-semibold">browse files</button>, or click & paste (Ctrl+V)</p>
-          <p class="text-[10px] text-slate-400 mt-1">Capture steps confirmation, success modal, etc.</p>
-        </div>
-        <!-- Thumbnails Container -->
-        <div id="execPreviews" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-1"></div>
+        <div class="image-grid" id="execImageGrid"></div>
       </div>
     </div>
 
     <!-- Card 4: MantisBT Defects Logged -->
-    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-      <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
-        <div class="flex items-center gap-2 text-slate-900 font-semibold text-base">
-          <i class="ph ph-bug text-rose-600 text-lg"></i> MantisBT Defects Logged
-        </div>
-        <button type="button" onclick="addDefectRow()" class="px-3 py-1 text-xs font-medium text-teal-700 bg-teal-50 border border-teal-200 hover:bg-teal-100 rounded-lg transition flex items-center gap-1">
-          <i class="ph ph-plus"></i> Add Mantis Bug
-        </button>
+    <div class="card">
+      <div class="card-title">
+        <span>MantisBT Defects Logged</span>
+        <button type="button" onclick="addDefectRow()" class="btn btn-slate">+ Add Mantis Bug</button>
       </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs border-collapse">
+      <div style="overflow-x: auto;">
+        <table>
           <thead>
-            <tr class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
-              <th class="p-2.5">Bug ID</th>
-              <th class="p-2.5">Severity</th>
-              <th class="p-2.5">Priority</th>
-              <th class="p-2.5">Description</th>
-              <th class="p-2.5">Status</th>
-              <th class="p-2.5 w-12 text-center">Action</th>
+            <tr>
+              <th>Bug ID</th>
+              <th>Severity</th>
+              <th>Priority</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th style="width: 40px; text-align: center;">Action</th>
             </tr>
           </thead>
-          <tbody id="defectTableBody" class="divide-y divide-slate-100">
-            <!-- Dynamically populated or kept empty if none -->
-          </tbody>
+          <tbody id="defectTableBody"></tbody>
         </table>
       </div>
-      <p id="noDefectsNotice" class="text-xs text-slate-400 italic text-center py-4">No open defects logged for this ticket. (Click "Add Mantis Bug" if any blockers were encountered).</p>
+      <p id="noDefectsNotice" style="font-size: 0.75rem; color: #94a3b8; text-align: center; margin-top: 10px;">No defects logged for this ticket.</p>
     </div>
 
   </main>
 
+  <!-- Add New Project Modal -->
+  <div class="modal" id="projectModal">
+    <div class="modal-box">
+      <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">Add New Project</h3>
+      <div class="form-group">
+        <label>Project / Application Name</label>
+        <input type="text" id="newProjectInput" placeholder="e.g. JNB-Hostel Portal">
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+        <button type="button" onclick="closeProjectModal()" class="btn btn-slate">Cancel</button>
+        <button type="button" onclick="saveNewProject()" class="btn btn-teal">Save Project</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const STORAGE_KEY = 'jnb_nivas_report_data_v2';
-    const PROJECTS_STORAGE_KEY = 'qa_report_saved_projects_list';
+    const STORAGE_KEY = 'jnb_nivas_clean_report_v2';
+    const PROJECTS_KEY = 'qa_report_projects_list';
 
-    // State arrays for base64 images
-    let prodScreenshots = [];
-    let execScreenshots = [];
+    let defaultProjects = ["JNB-Nivas Web Application", "JNB-Hostel Application", "APCFSS Portal"];
+    let prodImages = [];
+    let execImages = [];
 
-    // Projects list with initial default
-    let projectList = ["JNB-Nivas Web Application"];
-
-    // Dynamic Project Management Handlers
-    function initProjectsDropdown(selectedVal = null) {
-      const savedProjects = localStorage.getItem(PROJECTS_STORAGE_KEY);
-      if (savedProjects) {
-        try {
-          const parsed = JSON.parse(savedProjects);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            projectList = parsed;
-          }
-        } catch (e) {}
-      }
-
+    // Load Projects
+    function loadProjects() {
+      const savedProj = localStorage.getItem(PROJECTS_KEY);
+      let list = savedProj ? JSON.parse(savedProj) : defaultProjects;
       const select = document.getElementById('projectSelect');
       select.innerHTML = '';
-      projectList.forEach(proj => {
+      list.forEach(p => {
         const opt = document.createElement('option');
-        opt.value = proj;
-        opt.textContent = proj;
+        opt.value = p;
+        opt.textContent = p;
         select.appendChild(opt);
       });
-
-      if (selectedVal && projectList.includes(selectedVal)) {
-        select.value = selectedVal;
-      }
     }
 
-    function openNewProjectPrompt() {
-      document.getElementById('newProjectInput').value = '';
-      document.getElementById('newProjectModal').classList.remove('hidden');
-      document.getElementById('newProjectInput').focus();
-    }
-
-    function closeNewProjectPrompt() {
-      document.getElementById('newProjectModal').classList.add('hidden');
-    }
-
-    function saveNewProject() {
-      const val = document.getElementById('newProjectInput').value.trim();
-      if (!val) return;
-      if (!projectList.includes(val)) {
-        projectList.push(val);
-        localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projectList));
-      }
-      initProjectsDropdown(val);
-      closeNewProjectPrompt();
-      autoSave();
-    }
-
-    function handleProjectChange() {
-      autoSave();
-    }
-
-    // Screenshot Handling (Paste, Drag & Drop, File Upload)
-    function handleDragOver(e) {
-      e.preventDefault();
-      e.currentTarget.classList.add('border-teal-500', 'bg-teal-50/30');
-    }
-
-    function handleDragLeave(e) {
-      e.currentTarget.classList.remove('border-teal-500', 'bg-teal-50/30');
-    }
-
-    function handleDrop(e, type) {
-      e.preventDefault();
-      e.currentTarget.classList.remove('border-teal-500', 'bg-teal-50/30');
-      const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
-      processImageFiles(files, type);
-    }
-
-    function handleFileSelect(e, type) {
-      const files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
-      processImageFiles(files, type);
-      e.target.value = '';
-    }
-
-    function processImageFiles(files, type) {
-      files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          const base64 = evt.target.result;
-          if (type === 'prod') {
-            prodScreenshots.push({ id: Date.now() + Math.random(), src: base64, name: file.name || 'Prod Screenshot' });
-            renderScreenshots('prod');
-          } else {
-            execScreenshots.push({ id: Date.now() + Math.random(), src: base64, name: file.name || 'Evidence Screenshot' });
-            renderScreenshots('exec');
-          }
-          autoSave();
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // Global Clipboard Paste Handler
-    window.addEventListener('paste', function(e) {
-      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-      const activeZone = document.activeElement;
-      let targetType = 'exec'; // default target is execution evidence
-
-      if (activeZone && activeZone.id === 'prodDropZone') {
-        targetType = 'prod';
-      }
-
-      for (let index in items) {
-        const item = items[index];
-        if (item.kind === 'file' && item.type.startsWith('image/')) {
-          const blob = item.getAsFile();
-          processImageFiles([blob], targetType);
-        }
-      }
-    });
-
-    function removeScreenshot(type, id) {
-      if (type === 'prod') {
-        prodScreenshots = prodScreenshots.filter(img => img.id !== id);
-        renderScreenshots('prod');
-      } else {
-        execScreenshots = execScreenshots.filter(img => img.id !== id);
-        renderScreenshots('exec');
-      }
-      autoSave();
-    }
-
-    function renderScreenshots(type) {
-      const container = document.getElementById(type === 'prod' ? 'prodPreviews' : 'execPreviews');
-      const list = type === 'prod' ? prodScreenshots : execScreenshots;
-      container.innerHTML = '';
-
-      list.forEach(img => {
-        const div = document.createElement('div');
-        div.className = "relative group border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs";
-        div.innerHTML = `
-          <img src="${img.src}" alt="Screenshot" class="w-full h-28 object-cover cursor-pointer" onclick="window.open('${img.src}', '_blank')">
-          <button type="button" onclick="removeScreenshot('${type}', ${img.id})" class="absolute top-1 right-1 bg-rose-600 text-white rounded-full p-1 opacity-90 hover:opacity-100 shadow transition" title="Remove">
-            <i class="ph ph-trash text-xs"></i>
-          </button>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    // Auto-save logic
-    function autoSave() {
-      const defects = [];
-      document.querySelectorAll('#defectTableBody tr').forEach(row => {
-        defects.push({
-          id: row.querySelector('.d-id')?.value || '',
-          sev: row.querySelector('.d-sev')?.value || 'minor',
-          pri: row.querySelector('.d-pri')?.value || 'normal',
-          desc: row.querySelector('.d-desc')?.value || '',
-          status: row.querySelector('.d-status')?.value || 'resolved'
-        });
-      });
-
-      const data = {
-        projectName: document.getElementById('projectSelect').value,
-        mantisId: document.getElementById('mantisId').value,
-        buildVersion: document.getElementById('buildVersion').value,
-        testUrl: document.getElementById('testUrl').value,
-        loginRef: document.getElementById('loginRef').value,
-        moduleNames: document.getElementById('moduleNames').value,
-        featureDesc: document.getElementById('featureDesc').value,
-        execSteps: document.getElementById('execSteps').value,
-        actualResult: document.getElementById('actualResult').value,
-        testerName: document.getElementById('testerName').value,
-        prodScreenshots: prodScreenshots,
-        execScreenshots: execScreenshots,
-        defects: defects
-      };
-
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      } catch (err) {
-        console.warn("Storage quota full or restricted for large images", err);
-      }
-    }
-
-    setInterval(autoSave, 5000);
-    document.querySelectorAll('input, select, textarea').forEach(el => {
-      el.addEventListener('input', autoSave);
-    });
-
-    function addDefectRow(data = {}) {
-      document.getElementById('noDefectsNotice').style.display = 'none';
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td class="p-2"><input type="text" class="d-id w-full px-2 py-1 border rounded text-xs" placeholder="#00142" value="${data.id || ''}"></td>
-        <td class="p-2">
-          <select class="d-sev w-full px-2 py-1 border rounded text-xs bg-white">
-            <option ${data.sev === 'block' ? 'selected' : ''} value="block">block</option>
-            <option ${data.sev === 'crash' ? 'selected' : ''} value="crash">crash</option>
-            <option ${data.sev === 'major' ? 'selected' : ''} value="major">major</option>
-            <option ${!data.sev || data.sev === 'minor' ? 'selected' : ''} value="minor">minor</option>
-            <option ${data.sev === 'tweak' ? 'selected' : ''} value="tweak">tweak</option>
-            <option ${data.sev === 'text' ? 'selected' : ''} value="text">text</option>
-          </select>
-        </td>
-        <td class="p-2">
-          <select class="d-pri w-full px-2 py-1 border rounded text-xs bg-white">
-            <option ${data.pri === 'immediate' ? 'selected' : ''} value="immediate">immediate</option>
-            <option ${data.pri === 'urgent' ? 'selected' : ''} value="urgent">urgent</option>
-            <option ${data.pri === 'high' ? 'selected' : ''} value="high">high</option>
-            <option ${!data.pri || data.pri === 'normal' ? 'selected' : ''} value="normal">normal</option>
-            <option ${data.pri === 'low' ? 'selected' : ''} value="low">low</option>
-          </select>
-        </td>
-        <td class="p-2"><input type="text" class="d-desc w-full px-2 py-1 border rounded text-xs" placeholder="Issue details..." value="${data.desc || ''}"></td>
-        <td class="p-2">
-          <select class="d-status w-full px-2 py-1 border rounded text-xs bg-white">
-            <option ${data.status === 'new' ? 'selected' : ''} value="new">new</option>
-            <option ${data.status === 'assigned' ? 'selected' : ''} value="assigned">assigned</option>
-            <option ${!data.status || data.status === 'resolved' ? 'selected' : ''} value="resolved">resolved</option>
-            <option ${data.status === 'closed' ? 'selected' : ''} value="closed">closed</option>
-          </select>
-        </td>
-        <td class="p-2 text-center">
-          <button type="button" onclick="this.closest('tr').remove(); checkDefectCount();" class="text-rose-500 hover:text-rose-700">
-            <i class="ph ph-trash text-sm"></i>
-          </button>
-        </td>
-      `;
-      document.getElementById('defectTableBody').appendChild(tr);
-      tr.querySelectorAll('input, select').forEach(el => el.addEventListener('input', autoSave));
-    }
-
-    function checkDefectCount() {
-      const count = document.querySelectorAll('#defectTableBody tr').length;
-      if (count === 0) {
-        document.getElementById('noDefectsNotice').style.display = 'block';
-      }
-      autoSave();
-    }
-
-    function resetToDocDefaults() {
-      if (confirm('Reset fields to default values from the document?')) {
-        localStorage.removeItem(STORAGE_KEY);
-        initProjectsDropdown("JNB-Nivas Web Application");
-        document.getElementById('moduleNames').value = "Staff Management -> Staff Attendance Confirmation";
-        document.getElementById('mantisId').value = "";
-        document.getElementById('buildVersion').value = "Release-52";
-        document.getElementById('testUrl').value = "jnbnivas.dev.nidhi.apcfss.in";
-        document.getElementById('loginRef').value = "52";
-        document.getElementById('featureDesc').value = `Previously, the "Principal" designation was missing from the Staff Attendance Confirmation service in Production. Per the latest department requirements, added the "Principal" designation and validated its presence and functionality on the attendance confirmation screen.`;
-        document.getElementById('execSteps').value = `1. Navigate to the URL: JNB - Nivas Web Application\n2. Login as mentioned user, navigate to “Staff Management -> Staff Attendance Confirmation”, verify the presence of the "Principal" designation, check the record, select values and click “Confirm”.`;
-        document.getElementById('actualResult').value = "Functioning as Expected.";
-        document.getElementById('defectTableBody').innerHTML = '';
-        prodScreenshots = [];
-        execScreenshots = [];
-        renderScreenshots('prod');
-        renderScreenshots('exec');
-        checkDefectCount();
-      }
-    }
-
-    function copyMantisSummary() {
-      const p = document.getElementById('projectSelect').value;
-      const mId = document.getElementById('mantisId').value || 'N/A';
-      const bVer = document.getElementById('buildVersion').value;
-      const url = document.getElementById('testUrl').value;
-      const login = document.getElementById('loginRef').value;
-      const mod = document.getElementById('moduleNames').value;
-      const desc = document.getElementById('featureDesc').value;
-      const steps = document.getElementById('execSteps').value;
-      const res = document.getElementById('actualResult').value;
-      const tester = document.getElementById('testerName').value || 'QA Team';
-
-      const mantisNote = `=====================================================
-TEST EXECUTION REPORT
-=====================================================
-* Project / Application Name : ${p}
-* Tested Module / Features   : ${mod}
-* MantisBT Ticket ID         : ${mId}
-* Build Version              : ${bVer}
-* Test URL                   : ${url}
-* Login Reference            : ${login}
-* Tested By                  : ${tester}
-* Production References      : ${prodScreenshots.length} screenshot(s) attached in report
-* Execution Evidence         : ${execScreenshots.length} screenshot(s) attached in report
------------------------------------------------------
-DETAILED DESCRIPTION:
-${desc}
-
-EXECUTION STEPS:
-${steps}
-
-ACTUAL RESULT:
-${res}
-=====================================================`;
-
-      const tempTextArea = document.createElement("textarea");
-      tempTextArea.value = mantisNote;
-      document.body.appendChild(tempTextArea);
-      tempTextArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(tempTextArea);
-
-      alert('Copied MantisBT Execution Note to clipboard!');
-    }
-
-    function downloadReport() {
-      const p = document.getElementById('projectSelect').value;
-      const mId = document.getElementById('mantisId').value || 'N/A';
-      const bVer = document.getElementById('buildVersion').value;
-      const url = document.getElementById('testUrl').value;
-      const login = document.getElementById('loginRef').value;
-      const mod = document.getElementById('moduleNames').value;
-      const desc = document.getElementById('featureDesc').value;
-      const steps = document.getElementById('execSteps').value;
-      const res = document.getElementById('actualResult').value;
-      const tester = document.getElementById('testerName').value || 'QA Team';
-
-      // Build HTML for images
-      let prodImagesHtml = '';
-      if (prodScreenshots.length > 0) {
-        prodImagesHtml = `
-          <div class="space-y-2 pt-2">
-            <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Production Screenshot Reference</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              ${prodScreenshots.map(img => `
-                <div class="border rounded-lg overflow-hidden bg-slate-50">
-                  <img src="${img.src}" class="w-full h-auto object-contain">
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      }
-
-      let execImagesHtml = '';
-      if (execScreenshots.length > 0) {
-        execImagesHtml = `
-          <div class="space-y-2 pt-2">
-            <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Test Execution Evidence / Screenshots</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              ${execScreenshots.map(img => `
-                <div class="border rounded-lg overflow-hidden bg-slate-50">
-                  <img src="${img.src}" class="w-full h-auto object-contain">
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      }
-
-      const fullHtml = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Test Execution Report - ${p}</title>
-  <script src="https://cdn.tailwindcss.com"></` + `script>
-</head>
-<body class="bg-slate-50 p-6 md:p-12 flex justify-center text-slate-800">
-  <div class="max-w-4xl w-full bg-white p-8 rounded-2xl shadow-md border border-slate-200 space-y-6">
-    <div class="border-b pb-4">
-      <h2 class="text-2xl font-bold text-slate-900">Test Execution Report</h2>
-      <p class="text-sm text-slate-500 font-medium">${p} | Build: ${bVer}</p>
-    </div>
-    <div class="grid grid-cols-2 gap-4 text-xs">
-      <div><strong>Project Name:</strong> ${p}</div>
-      <div><strong>Tested Module:</strong> ${mod}</div>
-      <div><strong>Mantis Ticket:</strong> ${mId}</div>
-      <div><strong>Build Version:</strong> ${bVer}</div>
-      <div><strong>Test URL:</strong> ${url}</div>
-      <div><strong>Login Reference:</strong> ${login}</div>
-      <div class="col-span-2"><strong>Tested By:</strong> ${tester}</div>
-    </div>
-    <div class="text-xs space-y-1">
-      <strong class="block text-slate-700">Detailed Description about Features/Services Tested:</strong>
-      <p class="bg-slate-50 p-3 rounded border text-slate-600 leading-relaxed">${desc}</p>
-    </div>
-    ${prodImagesHtml}
-    <div class="text-xs space-y-1">
-      <strong class="block text-slate-700">Execution Steps:</strong>
-      <pre class="bg-slate-50 p-3 rounded border text-slate-600 font-sans whitespace-pre-wrap leading-relaxed">${steps}</pre>
-    </div>
-    <div class="text-xs">
-      <strong>Actual Result:</strong> <span class="text-emerald-700 font-semibold">${res}</span>
-    </div>
-    ${execImagesHtml}
-  </div>
-</body>
-</html>`;
-
-      const blob = new Blob([fullHtml], { type: 'text/html' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `Test_Execution_Report_${mId.replace('#','') || 'JNB_Nivas'}.html`;
-      a.click();
-    }
-
-    // Load initial data
-    window.onload = function() {
-      initProjectsDropdown();
-
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          const d = JSON.parse(saved);
-          if (d.projectName) {
-            initProjectsDropdown(d.projectName);
-          }
-          if (d.moduleNames) document.getElementById('moduleNames').value = d.moduleNames;
-          if (d.mantisId) document.getElementById('mantisId').value = d.mantisId;
-          if (d.buildVersion) document.getElementById('buildVersion').value = d.buildVersion;
-          if (d.testUrl) document.getElementById('testUrl').value = d.testUrl;
-          if (d.loginRef) document.getElementById('loginRef').value = d.loginRef;
-          if (d.featureDesc) document.getElementById('featureDesc').value = d.featureDesc;
-          if (d.execSteps) document.getElementById('execSteps').value = d.execSteps;
-          if (d.actualResult) document.getElementById('actualResult').value = d.actualResult;
-          if (d.testerName) document.getElementById('testerName').value = d.testerName;
-          if (Array.isArray(d.prodScreenshots)) {
-            prodScreenshots = d.prodScreenshots;
-            renderScreenshots('prod');
-          }
-          if (Array.isArray(d.execScreenshots)) {
-            execScreenshots = d.execScreenshots;
-            renderScreenshots('exec');
-          }
-          if (d.defects && d.defects.length > 0) {
-            d.defects.forEach(df => addDefectRow(df));
-          }
-        } catch (e) {}
-      }
-      checkDefectCount();
-    };
-  </script>
-</body>
-</html>
+    function openProjectModal() { document.getElementById
