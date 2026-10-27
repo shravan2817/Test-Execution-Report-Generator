@@ -4,74 +4,214 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QA Execution Report - JNB-Nivas</title>
-  <!-- Inbuilt Pure CSS - Zero CDN dependency, works everywhere -->
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: #f8fafc; color: #1e293b; padding-bottom: 50px; }
+    body { background-color: #f8fafc; color: #1e293b; padding-bottom: 70px; }
     
     /* Header */
-    header { background: #ffffff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .header-container { max-width: 1000px; margin: 0 auto; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-    .title-area h1 { font-size: 1.25rem; font-weight: 700; color: #0f172a; }
+    header { background: #ffffff; border-bottom: 1px solid #cbd5e1; position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .header-container { max-width: 1050px; margin: 0 auto; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .title-area h1 { font-size: 1.25rem; font-weight: 800; color: #0f172a; letter-spacing: -0.3px; }
     .title-area p { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
     
     /* Action Buttons */
-    .btn-group { display: flex; gap: 8px; align-items: center; }
-    .btn { padding: 6px 12px; font-size: 0.75rem; font-weight: 600; border-radius: 6px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
-    .btn-slate { background: #f1f5f9; color: #334155; border-color: #cbd5e1; }
-    .btn-slate:hover { background: #e2e8f0; }
+    .btn-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .btn { padding: 7px 14px; font-size: 0.75rem; font-weight: 600; border-radius: 6px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-slate { background: #ffffff; color: #334155; border-color: #cbd5e1; }
+    .btn-slate:hover { background: #f8fafc; border-color: #94a3b8; }
     .btn-teal { background: #0d9488; color: #ffffff; }
     .btn-teal:hover { background: #0f766e; }
+    .btn-blue { background: #2563eb; color: #ffffff; }
+    .btn-blue:hover { background: #1d4ed8; }
+    .btn-purple { background: #7c3aed; color: #ffffff; }
+    .btn-purple:hover { background: #6d28d9; }
     .btn-danger { background: #fff1f2; color: #e11d48; border-color: #fecdd3; }
     .btn-danger:hover { background: #ffe4e6; }
-    .badge-saved { font-size: 0.75rem; color: #059669; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 4px 8px; border-radius: 6px; font-weight: 500; }
+    .badge-saved { font-size: 0.72rem; color: #047857; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 4px 8px; border-radius: 6px; font-weight: 600; }
 
     /* Layout */
-    .main-container { max-width: 1000px; margin: 24px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 20px; }
+    .main-container { max-width: 1050px; margin: 24px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 22px; }
     
-    /* Cards */
-    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
-    .card-title { font-size: 0.95rem; font-weight: 700; color: #0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    /* Cards with Highlighted Side Headings */
+    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+    .card-title { 
+      font-size: 0.95rem; 
+      font-weight: 800; 
+      color: #0f172a; 
+      background: #f8fafc; 
+      border-left: 4px solid #0d9488; 
+      padding: 8px 12px; 
+      border-radius: 0 6px 6px 0; 
+      margin: -6px 0 18px 0; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
     
     /* Form Grid */
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    label { font-size: 0.76rem; font-weight: 700; color: #334155; }
     
-    .form-group { display: flex; flex-direction: column; gap: 5px; }
-    label { font-size: 0.75rem; font-weight: 600; color: #475569; }
+    /* Inputs & Select */
     input[type="text"], select, textarea {
-      width: 100%; padding: 8px 12px; font-size: 0.82rem; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: #ffffff; color: #1e293b;
+      width: 100%; 
+      padding: 9px 12px; 
+      font-size: 0.83rem; 
+      border: 1px solid #cbd5e1; 
+      border-radius: 6px; 
+      outline: none; 
+      background: #ffffff; 
+      color: #0f172a;
+    }
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url('data:image/svg+xml;charset=US-ASCII,<svg%20xmlns="http://www.w3.org/2000/svg"%20width="16"%20height="16"%20viewBox="0%200%2024%2024"%20fill="none"%20stroke="%23475569"%20stroke-width="2"%20stroke-linecap="round"%20stroke-linejoin="round"><polyline%20points="6%209%2012%2015%2018%209"></polyline></svg>');
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 14px;
+      padding-right: 32px;
+      cursor: pointer;
     }
     input:focus, select:focus, textarea:focus { border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15); }
-    textarea { resize: vertical; line-height: 1.4; }
+    textarea { resize: vertical; line-height: 1.5; }
 
-    /* Project add row */
-    .project-row { display: flex; gap: 6px; }
+    .project-row { display: flex; gap: 8px; }
 
     /* Screenshot Upload Zones */
     .drop-zone {
-      border: 2px dashed #cbd5e1; border-radius: 8px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; transition: 0.2s;
+      border: 2px dashed #94a3b8; border-radius: 8px; padding: 18px; text-align: center; background: #f8fafc; cursor: pointer; transition: 0.2s;
     }
     .drop-zone:hover, .drop-zone.dragover { border-color: #0d9488; background: #f0fdfa; }
     .drop-zone p { font-size: 0.8rem; color: #64748b; }
-    .drop-zone span { font-size: 0.75rem; color: #0d9488; font-weight: 600; }
+    .drop-zone span { font-size: 0.8rem; color: #0d9488; font-weight: 700; }
     
-    /* Previews */
     .image-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-    .image-preview { position: relative; width: 110px; height: 80px; border-radius: 6px; overflow: hidden; border: 1px solid #cbd5e1; }
+    .image-preview { position: relative; width: 120px; height: 85px; border-radius: 6px; overflow: hidden; border: 1px solid #cbd5e1; }
     .image-preview img { width: 100%; height: 100%; object-fit: cover; }
-    .image-preview button { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; }
+    .image-preview button { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.65); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; }
 
-    /* Mantis Defect Table */
-    table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-top: 8px; }
-    th { background: #f8fafc; color: #475569; font-weight: 600; text-align: left; padding: 8px; border-bottom: 1px solid #e2e8f0; }
-    td { padding: 8px; border-bottom: 1px solid #f1f5f9; }
-    .delete-btn { color: #e11d48; background: none; border: none; cursor: pointer; font-weight: bold; }
+    /* Defect Table */
+    table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-top: 10px; }
+    th { background: #f8fafc; color: #475569; font-weight: 700; text-align: left; padding: 10px; border-bottom: 2px solid #cbd5e1; }
+    td { padding: 8px; border-bottom: 1px solid #e2e8f0; }
+    .delete-btn { color: #e11d48; background: none; border: none; cursor: pointer; font-weight: 800; font-size: 15px; }
 
-    /* Modal */
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
-    .modal.active { display: flex; }
-    .modal-box { background: white; border-radius: 10px; padding: 20px; width: 340px; }
+    /* Modals */
+    .modal-overlay { 
+      display: none; 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(15, 23, 42, 0.6); 
+      backdrop-filter: blur(3px);
+      z-index: 1000; 
+      align-items: center; 
+      justify-content: center; 
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card { background: #ffffff; border-radius: 12px; padding: 24px; width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #cbd5e1; }
+
+    /* Large Preview Modal */
+    .preview-modal-card {
+      background: #ffffff;
+      width: 90%;
+      max-width: 900px;
+      max-height: 90vh;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+    .preview-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+    }
+    .preview-body {
+      padding: 24px;
+      overflow-y: auto;
+      background: #ffffff;
+    }
+
+    /* Soft UI Report Theme for Preview & Output */
+    .report-sheet {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .report-sheet h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #0f172a;
+      border-bottom: 2px solid #0d9488;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+    }
+    .report-meta-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 18px;
+    }
+    .report-meta-table td, .report-meta-table th {
+      padding: 8px 12px;
+      border: 1px solid #e2e8f0;
+      font-size: 0.8rem;
+    }
+    .report-meta-table th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: #475569;
+      width: 25%;
+    }
+    .report-section-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 16px 0 6px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .report-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 0.82rem;
+      color: #1e293b;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+    .report-img {
+      max-width: 100%;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      margin-top: 8px;
+    }
+
+    /* Bottom Action Bar */
+    .bottom-bar {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 10px;
+      padding: 16px;
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+    }
+
+    @media print {
+      header, .bottom-bar, .btn, .modal-overlay, .delete-btn, .drop-zone, .badge-saved { display: none !important; }
+      body { background: white; padding: 0; }
+      .card { border: none; box-shadow: none; padding: 10px 0; }
+    }
   </style>
 </head>
 <body>
@@ -86,8 +226,11 @@
       <div class="btn-group">
         <span id="saveStatus" class="badge-saved">💾 Auto-saved</span>
         <button type="button" onclick="resetToDocDefaults()" class="btn btn-danger">Reset</button>
-        <button type="button" onclick="copyMantisSummary()" class="btn btn-slate">Copy Mantis Note</button>
-        <button type="button" onclick="downloadReport()" class="btn btn-teal">Export HTML Report</button>
+        <button type="button" onclick="copyMantisSummary()" class="btn btn-slate">Copy Mantis</button>
+        <button type="button" onclick="openPreviewModal()" class="btn btn-purple">👁️ Preview Report</button>
+        <button type="button" onclick="exportToWord()" class="btn btn-blue">Word (.doc)</button>
+        <button type="button" onclick="window.print()" class="btn btn-slate">Print / PDF</button>
+        <button type="button" onclick="downloadReportHtml()" class="btn btn-teal">HTML</button>
       </div>
     </div>
   </header>
@@ -97,10 +240,8 @@
 
     <!-- Card 1: Application Details -->
     <div class="card">
-      <div class="card-title">Application & Build Details</div>
+      <div class="card-title">1. Application & Build Details</div>
       <div class="grid-2">
-        
-        <!-- Project Name with + New Button -->
         <div class="form-group">
           <label>Project Name / Application Name *</label>
           <div class="project-row">
@@ -109,7 +250,6 @@
           </div>
         </div>
 
-        <!-- Module Names (Right after Project Name) -->
         <div class="form-group">
           <label>Tested Module / Feature Names *</label>
           <input type="text" id="moduleNames" value="Staff Management -> Staff Attendance Confirmation">
@@ -139,13 +279,13 @@
 
     <!-- Card 2: Scope & Execution Steps -->
     <div class="card">
-      <div class="card-title">Scope & Execution Details</div>
-      <div class="form-group" style="margin-bottom: 12px;">
+      <div class="card-title">2. Scope & Execution Details</div>
+      <div class="form-group" style="margin-bottom: 14px;">
         <label>Detailed Description about Features/Services Tested</label>
         <textarea id="featureDesc" rows="3">Previously, the "Principal" designation was missing from the Staff Attendance Confirmation service in Production. Per the latest department requirements, added the "Principal" designation and validated its presence and functionality on the attendance confirmation screen.</textarea>
       </div>
 
-      <div class="form-group" style="margin-bottom: 12px;">
+      <div class="form-group" style="margin-bottom: 14px;">
         <label>Execution Steps</label>
         <textarea id="execSteps" rows="3">1. Navigate to the URL: JNB - Nivas Web Application
 2. Login as mentioned user, navigate to “Staff Management -> Staff Attendance Confirmation”, verify the presence of the "Principal" designation, check the record, select values and click “Confirm”.</textarea>
@@ -154,7 +294,7 @@
       <div class="grid-2">
         <div class="form-group">
           <label>Actual Result</label>
-          <input type="text" id="actualResult" value="Functioning as Expected." style="color: #059669; font-weight: 600;">
+          <input type="text" id="actualResult" value="Functioning as Expected." style="color: #0f172a; font-weight: 600;">
         </div>
         <div class="form-group">
           <label>Tested By / Tester Name</label>
@@ -165,11 +305,10 @@
 
     <!-- Card 3: Screenshot References & Test Evidence -->
     <div class="card">
-      <div class="card-title">Screenshot References & Test Evidence</div>
+      <div class="card-title">3. Screenshot References & Test Evidence</div>
       
-      <!-- Zone 1: Production Screenshot Reference -->
-      <div class="form-group" style="margin-bottom: 16px;">
-        <label>1. Production Screenshot Reference (Drag & Drop, Paste Ctrl+V, or Browse)</label>
+      <div class="form-group" style="margin-bottom: 18px;">
+        <label>Production Screenshot Reference (Drag & Drop, Paste Ctrl+V, or Browse)</label>
         <div class="drop-zone" id="prodDropZone" onclick="document.getElementById('prodFileInput').click()">
           <p>Click to Browse or <span>Drag & Drop / Paste (Ctrl+V)</span> Production Screenshot</p>
           <input type="file" id="prodFileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event, 'prod')">
@@ -177,9 +316,8 @@
         <div class="image-grid" id="prodImageGrid"></div>
       </div>
 
-      <!-- Zone 2: Execution Screenshots / Evidence -->
       <div class="form-group">
-        <label>2. Test Execution Screenshots / Verified Evidence</label>
+        <label>Test Execution Screenshots / Verified Evidence</label>
         <div class="drop-zone" id="execDropZone" onclick="document.getElementById('execFileInput').click()">
           <p>Click to Browse or <span>Drag & Drop / Paste (Ctrl+V)</span> Execution Evidence</p>
           <input type="file" id="execFileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event, 'exec')">
@@ -191,18 +329,18 @@
     <!-- Card 4: MantisBT Defects Logged -->
     <div class="card">
       <div class="card-title">
-        <span>MantisBT Defects Logged</span>
+        <span>4. MantisBT Defects Logged</span>
         <button type="button" onclick="addDefectRow()" class="btn btn-slate">+ Add Mantis Bug</button>
       </div>
       <div style="overflow-x: auto;">
         <table>
           <thead>
             <tr>
-              <th>Bug ID</th>
-              <th>Severity</th>
-              <th>Priority</th>
+              <th style="width: 120px;">Bug ID</th>
+              <th style="width: 100px;">Severity</th>
+              <th style="width: 100px;">Priority</th>
               <th>Description</th>
-              <th>Status</th>
+              <th style="width: 110px;">Status</th>
               <th style="width: 40px; text-align: center;">Action</th>
             </tr>
           </thead>
@@ -212,35 +350,66 @@
       <p id="noDefectsNotice" style="font-size: 0.75rem; color: #94a3b8; text-align: center; margin-top: 10px;">No defects logged for this ticket.</p>
     </div>
 
+    <!-- Bottom Preview & Actions Bar -->
+    <div class="bottom-bar">
+      <button type="button" onclick="openPreviewModal()" class="btn btn-purple" style="padding: 10px 20px; font-size: 0.85rem;">
+        👁️ Preview Final Report Before Download
+      </button>
+      <button type="button" onclick="exportToWord()" class="btn btn-blue" style="padding: 10px 18px; font-size: 0.85rem;">
+        Word (.doc)
+      </button>
+      <button type="button" onclick="window.print()" class="btn btn-slate" style="padding: 10px 18px; font-size: 0.85rem;">
+        Print / PDF
+      </button>
+    </div>
+
   </main>
 
   <!-- Add New Project Modal -->
-  <div class="modal" id="projectModal">
-    <div class="modal-box">
-      <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">Add New Project</h3>
+  <div class="modal-overlay" id="projectModal">
+    <div class="modal-card">
+      <h3 style="font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 12px;">Add New Project</h3>
       <div class="form-group">
         <label>Project / Application Name</label>
         <input type="text" id="newProjectInput" placeholder="e.g. JNB-Hostel Portal">
       </div>
-      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
         <button type="button" onclick="closeProjectModal()" class="btn btn-slate">Cancel</button>
         <button type="button" onclick="saveNewProject()" class="btn btn-teal">Save Project</button>
       </div>
     </div>
   </div>
 
-  <script>
-    const STORAGE_KEY = 'jnb_nivas_clean_report_v2';
-    const PROJECTS_KEY = 'qa_report_projects_list';
+  <!-- Interactive Live Preview Modal -->
+  <div class="modal-overlay" id="previewModal">
+    <div class="preview-modal-card">
+      <div class="preview-header">
+        <h3 style="font-size: 1rem; font-weight: 800; color: #0f172a;">Verify Report Preview (Soft UI View)</h3>
+        <div style="display:flex; gap:8px;">
+          <button type="button" onclick="exportToWord()" class="btn btn-blue">Word</button>
+          <button type="button" onclick="window.print()" class="btn btn-slate">PDF</button>
+          <button type="button" onclick="downloadReportHtml()" class="btn btn-teal">HTML</button>
+          <button type="button" onclick="closePreviewModal()" class="btn btn-danger">Close</button>
+        </div>
+      </div>
+      <div class="preview-body" id="previewModalContent">
+        <!-- Rendered Report will be injected here -->
+      </div>
+    </div>
+  </div>
 
-    let defaultProjects = ["JNB-Nivas Web Application", "JNB-Hostel Application", "APCFSS Portal"];
+  <script>
+    const STORAGE_KEY = 'jnb_nivas_clean_report_v4';
+    const PROJECTS_KEY = 'qa_report_projects_list_v4';
+
+    const initialProjects = ["JNB-Nivas Web Application", "JNB-Hostel Application", "APCFSS Portal"];
     let prodImages = [];
     let execImages = [];
 
-    // Load Projects
+    // Projects
     function loadProjects() {
-      const savedProj = localStorage.getItem(PROJECTS_KEY);
-      let list = savedProj ? JSON.parse(savedProj) : defaultProjects;
+      const saved = localStorage.getItem(PROJECTS_KEY);
+      let list = saved ? JSON.parse(saved) : initialProjects;
       const select = document.getElementById('projectSelect');
       select.innerHTML = '';
       list.forEach(p => {
@@ -251,4 +420,354 @@
       });
     }
 
-    function openProjectModal() { document.getElementById
+    function openProjectModal() { 
+      document.getElementById('projectModal').classList.add('active'); 
+      document.getElementById('newProjectInput').focus();
+    }
+    
+    function closeProjectModal() { 
+      document.getElementById('projectModal').classList.remove('active'); 
+      document.getElementById('newProjectInput').value = '';
+    }
+
+    function saveNewProject() {
+      const val = document.getElementById('newProjectInput').value.trim();
+      if (!val) { alert('Please enter project name'); return; }
+      let list = JSON.parse(localStorage.getItem(PROJECTS_KEY) || JSON.stringify(initialProjects));
+      if (!list.includes(val)) {
+        list.push(val);
+        localStorage.setItem(PROJECTS_KEY, JSON.stringify(list));
+      }
+      loadProjects();
+      document.getElementById('projectSelect').value = val;
+      closeProjectModal();
+      autoSave();
+    }
+
+    // Screenshots
+    function setupDropZone(zoneId, type) {
+      const zone = document.getElementById(zoneId);
+      zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) handleImageFiles(e.dataTransfer.files, type);
+      });
+    }
+    setupDropZone('prodDropZone', 'prod');
+    setupDropZone('execDropZone', 'exec');
+
+    window.addEventListener('paste', (e) => {
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      for (let item of items) {
+        if (item.type.indexOf('image') === 0) {
+          const file = item.getAsFile();
+          handleImageFiles([file], 'exec');
+        }
+      }
+    });
+
+    function handleFileSelect(e, type) {
+      if (e.target.files.length) handleImageFiles(e.target.files, type);
+    }
+
+    function handleImageFiles(files, type) {
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (type === 'prod') {
+            prodImages.push(event.target.result);
+            renderImages('prod');
+          } else {
+            execImages.push(event.target.result);
+            renderImages('exec');
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderImages(type) {
+      const grid = document.getElementById(type === 'prod' ? 'prodImageGrid' : 'execImageGrid');
+      const list = type === 'prod' ? prodImages : execImages;
+      grid.innerHTML = '';
+      list.forEach((src, idx) => {
+        const div = document.createElement('div');
+        div.className = 'image-preview';
+        div.innerHTML = `<img src="${src}"><button type="button" onclick="removeImage('${type}', ${idx})">×</button>`;
+        grid.appendChild(div);
+      });
+    }
+
+    function removeImage(type, idx) {
+      if (type === 'prod') prodImages.splice(idx, 1);
+      else execImages.splice(idx, 1);
+      renderImages(type);
+    }
+
+    // Defects Table
+    function addDefectRow(data = {}) {
+      document.getElementById('noDefectsNotice').style.display = 'none';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="text" class="d-id" placeholder="#00142" value="${data.id || ''}"></td>
+        <td>
+          <select class="d-sev">
+            <option value="minor" ${data.sev === 'minor' ? 'selected' : ''}>minor</option>
+            <option value="major" ${data.sev === 'major' ? 'selected' : ''}>major</option>
+            <option value="block" ${data.sev === 'block' ? 'selected' : ''}>block</option>
+            <option value="crash" ${data.sev === 'crash' ? 'selected' : ''}>crash</option>
+          </select>
+        </td>
+        <td>
+          <select class="d-pri">
+            <option value="normal" ${data.pri === 'normal' ? 'selected' : ''}>normal</option>
+            <option value="high" ${data.pri === 'high' ? 'selected' : ''}>high</option>
+            <option value="urgent" ${data.pri === 'urgent' ? 'selected' : ''}>urgent</option>
+          </select>
+        </td>
+        <td><input type="text" class="d-desc" placeholder="Summary..." value="${data.desc || ''}"></td>
+        <td>
+          <select class="d-status">
+            <option value="resolved" ${data.status === 'resolved' ? 'selected' : ''}>resolved</option>
+            <option value="closed" ${data.status === 'closed' ? 'selected' : ''}>closed</option>
+            <option value="new" ${data.status === 'new' ? 'selected' : ''}>new</option>
+          </select>
+        </td>
+        <td style="text-align:center;"><button type="button" class="delete-btn" onclick="this.closest('tr').remove(); checkDefectCount();">×</button></td>
+      `;
+      document.getElementById('defectTableBody').appendChild(tr);
+      tr.querySelectorAll('input, select').forEach(el => el.addEventListener('input', autoSave));
+    }
+
+    function checkDefectCount() {
+      if (document.querySelectorAll('#defectTableBody tr').length === 0) {
+        document.getElementById('noDefectsNotice').style.display = 'block';
+      }
+      autoSave();
+    }
+
+    // Generate Beautiful Soft UI Report HTML
+    function buildFormattedReportHtml() {
+      const p = document.getElementById('projectSelect').value;
+      const mId = document.getElementById('mantisId').value || 'N/A';
+      const bVer = document.getElementById('buildVersion').value;
+      const mod = document.getElementById('moduleNames').value;
+      const url = document.getElementById('testUrl').value;
+      const login = document.getElementById('loginRef').value;
+      const desc = document.getElementById('featureDesc').value;
+      const steps = document.getElementById('execSteps').value;
+      const res = document.getElementById('actualResult').value;
+      const tester = document.getElementById('testerName').value || 'QA Team';
+
+      let prodImgsHtml = prodImages.map(img => `<img src="${img}" class="report-img">`).join('');
+      let execImgsHtml = execImages.map(img => `<img src="${img}" class="report-img">`).join('');
+
+      return `
+        <div class="report-sheet">
+          <h2>Test Execution Report: ${p}</h2>
+          <table class="report-meta-table">
+            <tr>
+              <th>Project / Application Name</th><td>${p}</td>
+              <th>MantisBT Issue ID</th><td>${mId}</td>
+            </tr>
+            <tr>
+              <th>Build Version</th><td>${bVer}</td>
+              <th>Tested By</th><td>${tester}</td>
+            </tr>
+            <tr>
+              <th>Tested Module / Features</th><td colspan="3">${mod}</td>
+            </tr>
+            <tr>
+              <th>Test URL</th><td>${url}</td>
+              <th>Login Reference</th><td>${login}</td>
+            </tr>
+          </table>
+
+          <div class="report-section-title">Detailed Description:</div>
+          <div class="report-box">${desc}</div>
+
+          <div class="report-section-title">Execution Steps:</div>
+          <div class="report-box">${steps}</div>
+
+          <div class="report-section-title">Actual Result:</div>
+          <div class="report-box" style="font-weight:700; color:#0f172a;">${res}</div>
+
+          ${prodImgsHtml ? `<div class="report-section-title">Production Screenshot Reference:</div><div>${prodImgsHtml}</div>` : ''}
+          ${execImgsHtml ? `<div class="report-section-title">Execution Screenshots / Verified Evidence:</div><div>${execImgsHtml}</div>` : ''}
+        </div>
+      `;
+    }
+
+    // Modal Handlers
+    function openPreviewModal() {
+      document.getElementById('previewModalContent').innerHTML = buildFormattedReportHtml();
+      document.getElementById('previewModal').classList.add('active');
+    }
+
+    function closePreviewModal() {
+      document.getElementById('previewModal').classList.remove('active');
+    }
+
+    // Export 1: Word Document (.doc) with Soft Clean Styling
+    function exportToWord() {
+      const p = document.getElementById('projectSelect').value;
+      const mId = document.getElementById('mantisId').value || 'N/A';
+      const bVer = document.getElementById('buildVersion').value;
+      const mod = document.getElementById('moduleNames').value;
+      const url = document.getElementById('testUrl').value;
+      const login = document.getElementById('loginRef').value;
+      const desc = document.getElementById('featureDesc').value;
+      const steps = document.getElementById('execSteps').value;
+      const res = document.getElementById('actualResult').value;
+      const tester = document.getElementById('testerName').value || 'QA Team';
+
+      const htmlContent = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'><title>Test Execution Report</title>
+        <style>
+          body { font-family: 'Segoe UI', Calibri, Arial, sans-serif; font-size: 10.5pt; color: #1e293b; background: #ffffff; }
+          .header-box { border-bottom: 2.5pt solid #0d9488; padding-bottom: 6pt; margin-bottom: 12pt; }
+          h2 { color: #0f172a; margin: 0; font-size: 16pt; font-weight: bold; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10pt; margin-bottom: 14pt; }
+          td, th { border: 1pt solid #cbd5e1; padding: 7pt; font-size: 9.5pt; }
+          th { background-color: #f8fafc; color: #475569; text-align: left; font-weight: bold; }
+          .section-title { font-size: 10pt; font-weight: bold; color: #0f172a; text-transform: uppercase; margin-top: 12pt; margin-bottom: 4pt; }
+          .box { background-color: #f8fafc; border: 1pt solid #e2e8f0; padding: 8pt; font-size: 10pt; line-height: 1.4; }
+        </style>
+        </head><body>
+          <div class="header-box">
+            <h2>Test Execution Report: ${p}</h2>
+            <div style="font-size: 9pt; color: #64748b; margin-top: 2pt;">Build Version: ${bVer} | MantisBT Issue ID: ${mId}</div>
+          </div>
+          <table>
+            <tr><th width="28%">Project / Application</th><td>${p}</td><th width="20%">Tested By</th><td>${tester}</td></tr>
+            <tr><th>Tested Module / Features</th><td colspan="3">${mod}</td></tr>
+            <tr><th>Test URL</th><td>${url}</td><th>Login Reference</th><td>${login}</td></tr>
+          </table>
+          <div class="section-title">Detailed Description:</div>
+          <div class="box">${desc.replace(/\n/g, '<br>')}</div>
+          <div class="section-title">Execution Steps:</div>
+          <div class="box">${steps.replace(/\n/g, '<br>')}</div>
+          <div class="section-title">Actual Result:</div>
+          <div class="box" style="font-weight: bold; color: #0f172a;">${res}</div>
+        </body></html>`;
+
+      const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `Test_Execution_Report_${mId.replace('#','') || 'JNB'}.doc`;
+      a.click();
+    }
+
+    // Export 2: HTML
+    function downloadReportHtml() {
+      const p = document.getElementById('projectSelect').value;
+      const mId = document.getElementById('mantisId').value || 'N/A';
+      const reportHtml = buildFormattedReportHtml();
+
+      const fullHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Report - ${p}</title>
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #ffffff; padding: 30px; color: #1e293b; }
+        .wrapper { max-width: 850px; margin: 0 auto; }
+        .report-sheet { border: 1px solid #e2e8f0; border-radius: 10px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        h2 { font-size: 1.3rem; font-weight: 800; color: #0f172a; border-bottom: 2px solid #0d9488; padding-bottom: 8px; margin-bottom: 14px; }
+        .report-meta-table { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
+        .report-meta-table td, .report-meta-table th { padding: 8px 12px; border: 1px solid #e2e8f0; font-size: 0.8rem; }
+        .report-meta-table th { background: #f8fafc; font-weight: 700; color: #475569; width: 25%; text-align: left; }
+        .report-section-title { font-size: 0.85rem; font-weight: 800; color: #0f172a; margin: 16px 0 6px 0; text-transform: uppercase; }
+        .report-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; font-size: 0.82rem; color: #1e293b; line-height: 1.5; white-space: pre-wrap; }
+        .report-img { max-width: 100%; border-radius: 6px; border: 1px solid #cbd5e1; margin-top: 8px; }
+      </style>
+      </head><body><div class="wrapper">${reportHtml}</div></body></html>`;
+
+      const blob = new Blob([fullHtml], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `QA_Execution_Report_${mId.replace('#','') || 'JNB'}.html`;
+      a.click();
+    }
+
+    function copyMantisSummary() {
+      const p = document.getElementById('projectSelect').value;
+      const mId = document.getElementById('mantisId').value || 'N/A';
+      const bVer = document.getElementById('buildVersion').value;
+      const mod = document.getElementById('moduleNames').value;
+      const url = document.getElementById('testUrl').value;
+      const login = document.getElementById('loginRef').value;
+      const desc = document.getElementById('featureDesc').value;
+      const steps = document.getElementById('execSteps').value;
+      const res = document.getElementById('actualResult').value;
+      const tester = document.getElementById('testerName').value || 'QA Team';
+
+      const note = `=====================================================
+TEST EXECUTION REPORT
+=====================================================
+* Application Name : ${p}
+* MantisBT Ticket  : ${mId}
+* Build Version    : ${bVer}
+* Tested Module    : ${mod}
+* Test URL         : ${url}
+* Login Reference  : ${login}
+* Tested By        : ${tester}
+-----------------------------------------------------
+DESCRIPTION:
+${desc}
+
+EXECUTION STEPS:
+${steps}
+
+ACTUAL RESULT:
+${res}
+=====================================================`;
+
+      navigator.clipboard.writeText(note).then(() => alert('Copied MantisBT Note to clipboard!'));
+    }
+
+    function autoSave() {
+      const data = {
+        project: document.getElementById('projectSelect').value,
+        module: document.getElementById('moduleNames').value,
+        mantisId: document.getElementById('mantisId').value,
+        build: document.getElementById('buildVersion').value,
+        url: document.getElementById('testUrl').value,
+        login: document.getElementById('loginRef').value,
+        desc: document.getElementById('featureDesc').value,
+        steps: document.getElementById('execSteps').value,
+        res: document.getElementById('actualResult').value,
+        tester: document.getElementById('testerName').value
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    setInterval(autoSave, 4000);
+    document.querySelectorAll('input, select, textarea').forEach(el => el.addEventListener('input', autoSave));
+
+    function resetToDocDefaults() {
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    }
+
+    window.onload = function() {
+      loadProjects();
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const d = JSON.parse(saved);
+          if (d.project) document.getElementById('projectSelect').value = d.project;
+          if (d.module) document.getElementById('moduleNames').value = d.module;
+          if (d.mantisId) document.getElementById('mantisId').value = d.mantisId;
+          if (d.build) document.getElementById('buildVersion').value = d.build;
+          if (d.url) document.getElementById('testUrl').value = d.url;
+          if (d.login) document.getElementById('loginRef').value = d.login;
+          if (d.desc) document.getElementById('featureDesc').value = d.desc;
+          if (d.steps) document.getElementById('execSteps').value = d.steps;
+          if (d.res) document.getElementById('actualResult').value = d.res;
+          if (d.tester) document.getElementById('testerName').value = d.tester;
+        } catch (e) {}
+      }
+    };
+  </script>
+</body>
+</html>
